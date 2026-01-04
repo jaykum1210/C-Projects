@@ -1,0 +1,46 @@
+# Ignore compiled binary files
+*.exe
+*.out
+*.o
+*.obj
+
+# Ignore assembly files
+*.s
+*.asm
+
+# Ignore debugging files
+*.dll
+*.so
+*.dylib
+
+# Ignore log files
+*.log
+
+# Ignore temporary files created by editors
+*~
+*.swp
+*.tmp
+*.bak
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore CodeBlocks files
+*.layout
+*.depend
+*.cbp
+bin/
+obj/
+
+# Ignore Dev-C++ files
+*.dev
+*.res
+
+# Ignore CLion/JetBrains files
+.idea/
+cmake-build-debug/
+cmake-build-release/
+
+# Ignore OS-generated files
+.DS_Store
+Thumbs.db
