@@ -20,7 +20,7 @@ struct student_info
     char stu_mother_occu[50];
 
     char stu_dob[11];                              // DD/MM/YYYY
-    char stu_gender;                               // M / F / O
+    char stu_gender[10];                               // M / F / O
     char stu_caste[20];
     
     char stu_email[100];                           // Should contain "@gmail.com"
@@ -147,34 +147,6 @@ void readoptionalstring(const char *msg, char *str, int size) {
 
 // Checks Gender
 
-void readgender(char *msg, char *str){
-    
-    // To Check the Full input string
-    char input[10];
-
-    do {
-        printf("%s", msg);
-        fgets(input, sizeof(input), stdin);
-        input[strcspn(input, "\n")] = '\0';
-
-        if (strlen(input) == 1) {
-
-            //Make The Character Uppercase
-            char g = toupper(input[0]);
-
-            if (g == 'M' || g == 'F' || g == 'O') {
-                *str = g;
-                return;
-            }
-        }
-
-        printf("Invalid input! Enter M (Male), F (Female), or O (Other).\n");
-
-    } while (1);
-}
-
-// Checks Gender
-
 void readgender(char *msg, char *str, int size){
     while (1)
     {
@@ -200,9 +172,134 @@ void readgender(char *msg, char *str, int size){
             return;   // valid input → exit function
         }
 
-        printf("Invalid caste! Please enter Gen, OBC, SC or ST.\n");
+        printf("Invalid Caste! Please Enter Gen, OBC, SC or ST.\n");
     }
     
+}
+
+// Checks Email Address
+
+void readmail(char *msg,char *str,int size){
+    while (1)
+    {   
+        printf("%s",msg);
+
+        if (fgets(str, size, stdin) == NULL)
+            continue;
+        
+        // Remove newline
+        str[strcspn(str, "\n")] = '\0';
+
+        // Check if "@gmail.com" exists
+        if (strstr(str, "@gmail.com") != NULL)
+        {
+            return;   // valid email → exit function
+        }
+
+        printf("Invalid Email Address!\n");
+    }
+}
+
+// Checks Mobile Number
+
+void readmobilenumber(char *msg,char *str,int size){
+    while (1)
+    {
+        printf("%s",msg);
+
+        if (fgets(str, size, stdin) == NULL)
+            continue;
+        
+        // Remove newline
+        str[strcspn(str, "\n")] = '\0';
+
+        // Length must be exactly 10
+        if (strlen(str)!=10)
+        {
+            printf("Invalid Mobile Number\n");
+            continue;
+        }
+
+        // First digit check (Indian numbers)
+        if (str[0]<'6' || str[0]>'9')
+        {
+            printf("Invalid Mobile Number\n");
+            continue;
+        }
+        
+        // All characters must be digits
+        int valid = 1;
+        for (int i = 0; i < 10; i++)
+        {
+            if (!isdigit((unsigned char)str[i]))
+            {
+                valid = 0;
+                break;
+            }
+        }
+
+        if (!valid)
+        {
+            printf("Invalid Mobile Number\n");
+            continue;
+        }
+
+        return;
+    }
+}
+
+// Checks Zipcode
+
+void readzipcode(char *msg, int *zipcode_number){
+    while (1)
+    {
+        printf("%s", msg);
+
+        if (scanf("%d", zipcode_number) != 1)
+        {
+            printf("Invalid input! Enter numbers only.\n");
+
+            // Clear input buffer
+            while (getchar() != '\n');
+            continue;
+        }
+
+        if (*zipcode_number < 100000 || *zipcode_number > 999999)
+        {
+            printf("Please enter a valid 6-digit zipcode.\n");
+            continue;
+        }
+
+        // Clear leftover newline
+        while (getchar() != '\n');
+
+        return;   // valid zipcode
+        
+    }
+    
+}
+
+// Generate School Gmail Id
+
+void generate_student_email(char *firstname, char *lastname, int reg_num,char *email,int size){
+    char fname[50], lname[50];
+
+    // Copy names safely
+    strncpy(fname, firstname, sizeof(fname));
+    strncpy(lname, lastname, sizeof(lname));
+
+    fname[sizeof(fname) - 1] = '\0';
+    lname[sizeof(lname) - 1] = '\0';
+
+    // Convert to lowercase
+    for (int i = 0; fname[i] != '\0'; i++)
+        fname[i] = tolower((unsigned char)fname[i]);
+
+    for (int i = 0; lname[i] != '\0'; i++)
+        lname[i] = tolower((unsigned char)lname[i]);
+
+    // Generate email
+    snprintf(email, size, "%s.%s.%d@gmail.com", fname, lname, reg_num);
 }
 
 // Add Student Personal Info
@@ -218,16 +315,43 @@ void add_student_personal_info(){
     // Registration Number
     st_in.Stu_registration_number = generate_registration_number();
 
-    readrequiredstring("Enter First Name : ", st_in.stu_firstname,sizeof(st_in.stu_firstname));             // Enter First Name
-    readoptionalstring("Enter Middle Name : ",st_in.stu_middlename,sizeof(st_in.stu_middlename));           // Enter Middle Name
-    readrequiredstring("Enter Last Name : ",st_in.stu_lastname,sizeof(st_in.stu_lastname));
-    readrequiredstring("Enter Father's Name : ",st_in.stu_fathername,sizeof(st_in.stu_fathername));
-    readrequiredstring("Enter Mother's Name : ",st_in.stu_mothername,sizeof(st_in.stu_mothername));
-    readrequiredstring("Enter Father's Occupation : ",st_in.stu_father_occu,sizeof(st_in.stu_father_occu));
-    readrequiredstring("Enter Mother's Occupation : ",st_in.stu_mother_occu,sizeof(st_in.stu_mother_occu));
-    readrequiredstring("Enter D.O.B (DD/MM/YYYY): ",st_in.stu_dob,sizeof(st_in.stu_dob));
-    readgender("Enter Gender (M/F/O) : ",st_in.stu_gender);
-    readcaste("Enter Caste (Gen/OBC/SC/ST) : ",st_in.stu_caste,sizeof(st_in.stu_caste));
+    readrequiredstring("Enter First Name : ", st_in.stu_firstname,sizeof(st_in.stu_firstname));                             // Enter First Name
+    readoptionalstring("Enter Middle Name : ",st_in.stu_middlename,sizeof(st_in.stu_middlename));                           // Enter Middle Name
+    readrequiredstring("Enter Last Name : ",st_in.stu_lastname,sizeof(st_in.stu_lastname));                                 // Enter Last Name
+    readrequiredstring("Enter Father's Name : ",st_in.stu_fathername,sizeof(st_in.stu_fathername));                         // Enter Father's Name
+    readrequiredstring("Enter Mother's Name : ",st_in.stu_mothername,sizeof(st_in.stu_mothername));                         // Enter Mother's Name
+    readrequiredstring("Enter Father's Occupation : ",st_in.stu_father_occu,sizeof(st_in.stu_father_occu));                 // Enter Father's Occupation
+    readrequiredstring("Enter Mother's Occupation : ",st_in.stu_mother_occu,sizeof(st_in.stu_mother_occu));                 // Enter Mother's Occupation
+    readrequiredstring("Enter D.O.B (DD/MM/YYYY): ",st_in.stu_dob,sizeof(st_in.stu_dob));                                   // Enter DOB in DD/MM//YYYY Format
+    readgender("Enter Gender (M/F/O) : ",st_in.stu_gender,sizeof(st_in.stu_gender));                                                                 // Enter Gender in 'M'/'F'/'O'
+    readcaste("Enter Caste (Gen/OBC/SC/ST) : ",st_in.stu_caste,sizeof(st_in.stu_caste));                                    // Enter Caste - 'OBC'/'GEN'/'ST'/'SC'
+    readmail("Enter Gmail Address : ",st_in.stu_email,sizeof(st_in.stu_email));                                             // Enter Personal Gmail Address
+    readmobilenumber("Enter Mobile Number : ",st_in.stu_mobile_number,sizeof(st_in.stu_mobile_number));                     // Enter Student Mobile Number
+    readmobilenumber("Enter Father's Mobile Number : ",st_in.stu_father_number,sizeof(st_in.stu_father_number));            // Enter Father's Mobile Number
+    readrequiredstring("Enter Street Name : ",st_in.stu_street,sizeof(st_in.stu_street));                                   // Enter Street Name
+    readrequiredstring("Enter Area : ",st_in.stu_area,sizeof(st_in.stu_area));                                              // Enter Area Name
+    readrequiredstring("Enter City Name : ",st_in.stu_city,sizeof(st_in.stu_city));                                         // Enter City Name
+    readrequiredstring("Enter State : ",st_in.stu_state,sizeof(st_in.stu_state));                                           // Enter State
+    readzipcode("Enter Zipcode : ",st_in.stu_zipcode);                                                                      // Enter Zipcode in 6 digit only
+    
+    generate_student_email(                                                                                                 // School Gmail Id (Autogenerate)
+        st_in.stu_firstname,
+        st_in.stu_lastname,
+        st_in.Stu_registration_number,
+        st_in.Stu_School_email,
+        sizeof(st_in.Stu_School_email)
+    );
+    printf("Generated Registration Number : %d\n",st_in.Stu_registration_number);
+    printf("Generated School Gmail Id : %s",st_in.Stu_School_email);
+    fp = fopen("student.dat", "ab");
+    if (fp == NULL)
+    {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    fwrite(&st_in, sizeof(struct student_info), 1, fp);
+    fclose(fp);
 }
 
 // Student Feature Select
