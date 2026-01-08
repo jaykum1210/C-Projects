@@ -83,6 +83,8 @@ int readInt(int *var){
     return 1;                                       // Success
 }
 
+// ========================== add_student_personal_info Function Items==========================
+
 // Gennerate Registration Number
 
 int generate_registration_number(){
@@ -110,7 +112,11 @@ int generate_registration_number(){
     fseek(fp, -sizeof(struct student_info), SEEK_END);
 
     // Read last student
-    fread(&st_info, sizeof(struct student_info), 1, fp);
+    if (fread(&st_info, sizeof(struct student_info), 1, fp) != 1) {
+        fclose(fp);
+        return 1000;
+    }
+
 
     //Close File
     fclose(fp);
@@ -167,7 +173,7 @@ void readgender(char *msg, char *str,int size){
         // Make the Character in Uppercase
         str[0] = toupper((unsigned char)str[0]);
 
-        if (str[0]!='M' || str[0]!='F' || str[0]!='O')
+        if (str[0]!='M' && str[0]!='F' && str[0]!='O')
         {
             printf("Enter Gender in The Format - 'M'/'F'/'O'\n ");
             continue;
@@ -363,7 +369,7 @@ void add_student_personal_info(){
     readrequiredstring("Enter Area : ",st_in.stu_area,sizeof(st_in.stu_area));                                              // Enter Area Name
     readrequiredstring("Enter City Name : ",st_in.stu_city,sizeof(st_in.stu_city));                                         // Enter City Name
     readrequiredstring("Enter State : ",st_in.stu_state,sizeof(st_in.stu_state));                                           // Enter State
-    readzipcode("Enter Zipcode : ",st_in.stu_zipcode);                                                                      // Enter Zipcode in 6 digit only
+    readzipcode("Enter Zipcode : ",&st_in.stu_zipcode);                                                                      // Enter Zipcode in 6 digit only
     
     generate_student_email(                                                                                                 // School Gmail Id (Autogenerate)
         st_in.stu_firstname,
@@ -374,7 +380,7 @@ void add_student_personal_info(){
     );
     printf("Generated Registration Number : %d\n",st_in.Stu_registration_number);
     printf("Generated School Gmail Id : %s",st_in.Stu_School_email);
-    fp = fopen("student.dat", "ab");
+    fp = fopen("Student_information.dat", "ab");
     if (fp == NULL)
     {
         printf("Error opening file!\n");
@@ -384,6 +390,10 @@ void add_student_personal_info(){
     fwrite(&st_in, sizeof(struct student_info), 1, fp);
     fclose(fp);
 }
+
+// ========================== add_student_academic_info Function Items ==========================
+
+
 
 // Student Feature Select
 
