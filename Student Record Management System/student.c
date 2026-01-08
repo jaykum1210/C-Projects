@@ -147,7 +147,38 @@ void readoptionalstring(const char *msg, char *str, int size) {
 
 // Checks Gender
 
-void readgender(char *msg, char *str, int size){
+void readgender(char *msg, char *str,int size){
+    while (1)
+    {
+        printf("%s",msg);
+        if (fgets(str, size, stdin) == NULL)
+            continue;
+
+        // Remove newline
+        str[strcspn(str, "\n")] = '\0';
+
+        // Make the Lenght Only 1
+        if (strlen(str)!=1)
+        {
+            printf("Enter Gender in The Format - 'M'/'F'/'O'\n ");
+            continue;
+        }
+        
+        // Make the Character in Uppercase
+        str[0] = toupper((unsigned char)str[0]);
+
+        if (str[0]!='M' || str[0]!='F' || str[0]!='O')
+        {
+            printf("Enter Gender in The Format - 'M'/'F'/'O'\n ");
+            continue;
+        }
+        return;                                      // Valid input
+    }
+}
+
+// Checks Caste
+
+void readcaste(char *msg, char *str, int size){
     while (1)
     {
         printf("%s", msg);
