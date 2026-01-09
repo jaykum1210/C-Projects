@@ -6,6 +6,16 @@
 #include <ctype.h>
 #include <stdbool.h>
 
+// Subejct Deatils
+
+#define MAX_SUBJECTS 10
+#define SUBJECT_LEN 30
+
+#define MAX_BEFORE_DIVIDE 40
+#define MAX_AFTER_DIVIDE  30
+#define SHIFT_COUNT       10
+
+
 // student informations
 
 struct student_info
@@ -40,6 +50,33 @@ struct student_info
 
 };
 
+// Add Student Acaedmic Data
+
+struct add_student_academic_data
+{
+    int stu_registration_number;                    // Student Registration Number
+
+    int stu_class;                                  // Student Current Class
+    char stu_section;                               // Student Class Section
+    int stu_section_count;
+    char stream[10];                                // Stream of student only if the class is greater than 10
+    
+    char stu_subjects[MAX_SUBJECTS][SUBJECT_LEN];   // Subjects Enrolled to student
+    int stu_subject_count;                          // Number of subject Enrolled
+
+    float stu_last_percentage;                      // Last Year Percentage
+    char stu_last_school[100];                      // Last School Name
+    
+    char stu_last_address_street[100];              // Last School Street Name When Not Same
+    char stu_last_address_area[100];                // Last School Area Name When Not Same
+    char stu_last_address_city[100];                // Last School City Name When Not Same
+    char stu_last_address_state[100];               // Last School State Name When Not Same
+    
+    char stu_last_session_year[10];                 // Last Session Year in 'YYYY-YYYY' Format
+    char stu_academic_year[11];                      // Current Session Year in 'YYYY-YYYY' Foramt
+};
+
+
 // Dashboard (Main Menu)
 
 void main_menu(){
@@ -60,27 +97,29 @@ void student_dashboard(){
     printf("\n=========================================================\n");
     printf("1. Add Student Personal Details");
     printf("2. Add Academic Details\n");
-    printf("3. Update Student Information\n");
-    printf("4. View All Students\n");
-    printf("5. View Courses & Teachers Assigned\n");
-    printf("6. Search Student\n");
-    printf("7. Sort Student Records\n");
-    printf("8. View Student Result\n");
-    printf("9. Count Total Students\n");
-    printf("10. Delete Student Record\n");
-    printf("11. Exit\n");
+    printf("3. See Student Academic Details.\n");
+    printf("4. Update Student Information\n");
+    printf("5. View All Students\n");
+    printf("6. View Courses & Teachers Assigned\n");
+    printf("7. Search Student\n");
+    printf("8. Sort Student Records\n");
+    printf("9. View Student Result\n");
+    printf("10. Count Total Students\n");
+    printf("11. Delete Student Record\n");
+    printf("12. Exit\n");
 }
 
 // Check Int Input in optoin choose
 
-int readInt(int *var){
-    if (scanf("%d",var)!=1)
+int readInt(int *var)
+{
+    if (scanf("%d", var) != 1)
     {
-        printf("Invalid option! Please enter a number.\n");
-        while (getchar() != '\n');                  // Clear Buffer
-        return 0;                                   // Failure
+        printf("Invalid input! Please enter a number.\n");
+        while (getchar() != '\n');
+        return 0;
     }
-    return 1;                                       // Success
+    return 1;
 }
 
 // ========================== add_student_personal_info Function Items==========================
@@ -349,6 +388,13 @@ void add_student_personal_info(){
     // clear buffer safely
     while ((ch = getchar()) != '\n' && ch != EOF);
 
+    fp = fopen("Student_academic.dat", "ab");
+    if (fp == NULL)
+    {
+        printf("Error: Unable to open academic file!\n");
+        return;
+    }
+
     // Registration Number
     st_in.Stu_registration_number = generate_registration_number();
 
@@ -393,7 +439,99 @@ void add_student_personal_info(){
 
 // ========================== add_student_academic_info Function Items ==========================
 
+// Autogenerate Section
 
+char auto_generate_section(int stu_class)
+{
+    FILE *fp;
+    struct add_student_academic_data st;
+    int section_count[26] = {0};
+    char max_section = 'A';
+
+    fp = fopen("Student_academic.dat", "rb");
+    if (fp == NULL)
+        return 'A';   // first student of this class
+
+    while (fread(&st, sizeof(st), 1, fp))
+    {
+        if (st.stu_class == stu_class)
+        {
+            int idx = st.stu_section - 'A';
+            section_count[idx]++;
+
+            if (st.stu_section > max_section)
+                max_section = st.stu_section;
+        }
+    }
+    fclose(fp);
+
+    /* Find first section with available space */
+    for (int i = 0; i <= max_section - 'A'; i++)
+    {
+        int limit = (i == 0) ? MAX_BEFORE_DIVIDE : MAX_AFTER_DIVIDE;
+
+        if (section_count[i] < limit)
+            return 'A' + i;
+    }
+
+    /* All existing sections are full → create new section */
+    return max_section + 1;
+}
+
+// Student Academic Info
+
+void add_student_academic_info(){
+    FILE *fp;
+    struct add_student_academic_data st_academic;
+    int ch;
+
+    // clear buffer safely
+    while ((ch = getchar())!= '\n' && ch!= EOF);
+    
+    fp = fopen("Student_academic.dat", "ab");
+    if (fp == NULL)
+    {
+        printf("Error: Unable to open academic file!\n");
+        return;
+    }
+
+    // Connecting Both the Files Student_Information and Student_Academic
+    printf("Enter Registration Number : ");
+    scanf("%d",&st_academic.stu_registration_number);
+
+    // clear buffer safely
+    while ((ch = getchar())!= '\n' && ch!= EOF);
+
+    readclass("Enter Class : ", &st_academic.stu_class);
+
+    // Autogenerate Section
+    st_academic.stu_section = auto_generate_section(st_academic.stu_class);
+
+    if (st_academic.stu_class>10)
+    {
+        readstream("Enter Stream (PCM/PCB/PCMB/COMMERCE/ARTS) : ",st_academic.stream,sizeof(st_academic.stream));
+    }
+    else
+    {
+        strcpy(st_academic.stream, "NA");
+    }
+
+    st_academic.stu_subject_count = auto_assign_subject(st_academic.stu_class,st_academic.stu_subjects);
+
+    printf("Enter Last Year Percentage : ");
+    scanf("%f", &st_academic.stu_last_percentage);
+
+    while ((ch = getchar()) != '\n' && ch != EOF);
+
+    readrequiredstring("Enter Last School Name : ",st_academic.stu_last_school,sizeof(st_academic.stu_last_school));
+
+    readsession("Enter Last Session Year : ",st_academic.stu_last_session_year,sizeof(st_academic.stu_last_session_year));
+
+    readsession("Enter Currect Session Year : ",st_academic.stu_academic_year,sizeof(st_academic.stu_academic_year));
+
+    fwrite(&st_academic, sizeof(st_academic), 1, fp);
+    fclose(fp);
+}
 
 // Student Feature Select
 
@@ -407,30 +545,32 @@ void student_features(int feature_choice){
         add_student_academic_info();                // Add Student Academic Information
         break;
     case 3:
+        see_student_academic_details();
+    case 4:
         update_student_info();                      // Update Student Information
         break;
-    case 4:
+    case 5:
         view_all_students();                        // View All Students
         break;
-    case 5:
+    case 6:
         view_course_teacher();                      // View Course and Teacher Enrolled of a Student
         break;
-    case 6:
+    case 7:
         search_student();                           // Search Student according to - id, Registration number, gmail, name etc.
         break;
-    case 7:
+    case 8:
         sort_student_record();                      // Sort all Student Details by name, registration number, etc.
         break;
-    case 8:
+    case 9:
         view_student_result();                      // View Student Result
         break;
-    case 9:
+    case 10:
         count_total_student();                      // View number of students in school, class and section
         break;
-    case 10:
+    case 11:
         delete_student();                           // Delete Student Detail
         break;
-    case 11:
+    case 12:
         printf("Exiting....\n");                    // Exit Student Feature
         break;
     default:
@@ -474,7 +614,7 @@ int main(){
             {
                 continue;
             }
-            while (student_dashboard!=11)
+            while (student_dashboard!=12)
             {
                 student_Features(student_dashboard);
             }
