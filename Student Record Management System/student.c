@@ -1,4 +1,4 @@
-//header Files
+// header Files
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -12,9 +12,8 @@
 #define SUBJECT_LEN 30
 
 #define MAX_BEFORE_DIVIDE 40
-#define MAX_AFTER_DIVIDE  30
-#define SHIFT_COUNT       10
-
+#define MAX_AFTER_DIVIDE 30
+#define SHIFT_COUNT 10
 
 // student informations
 
@@ -29,57 +28,56 @@ struct student_info
     char stu_father_occu[50];
     char stu_mother_occu[50];
 
-    char stu_dob[11];                              // DD/MM/YYYY
-    char stu_gender[10];                               // M / F / O
+    char stu_dob[11];    // DD/MM/YYYY
+    char stu_gender[10]; // M / F / O
     char stu_caste[20];
-    
-    char stu_email[100];                           // Should contain "@gmail.com"
-    char stu_mobile_number[15];   
+
+    char stu_email[100]; // Should contain "@gmail.com"
+    char stu_mobile_number[15];
     char stu_father_number[15];
-    
+
     char stu_street[50];
     char stu_area[50];
     char stu_city[50];
     char stu_state[50];
-    int stu_zipcode;                               // Only 6 Digits
+    int stu_zipcode; // Only 6 Digits
 
     // Auto Generate Items
 
-    int Stu_registration_number;                   // Auto Generate From 1000
-    char Stu_School_email[100];                    // Auto Generate By Combining firstname + lastname + registration_number + "@cprojects.com"
-
+    int Stu_registration_number; // Auto Generate From 1000
+    char Stu_School_email[100];  // Auto Generate By Combining firstname + lastname + registration_number + "@cprojects.com"
 };
 
 // Add Student Acaedmic Data
 
 struct add_student_academic_data
 {
-    int stu_registration_number;                    // Student Registration Number
+    int stu_registration_number; // Student Registration Number
 
-    int stu_class;                                  // Student Current Class
-    char stu_section;                               // Student Class Section
+    int stu_class;    // Student Current Class
+    char stu_section; // Student Class Section
     int stu_section_count;
-    char stream[10];                                // Stream of student only if the class is greater than 10
-    
-    char stu_subjects[MAX_SUBJECTS][SUBJECT_LEN];   // Subjects Enrolled to student
-    int stu_subject_count;                          // Number of subject Enrolled
+    char stream[10]; // Stream of student only if the class is greater than 10
 
-    float stu_last_percentage;                      // Last Year Percentage
-    char stu_last_school[100];                      // Last School Name
-    
-    char stu_last_address_street[100];              // Last School Street Name When Not Same
-    char stu_last_address_area[100];                // Last School Area Name When Not Same
-    char stu_last_address_city[100];                // Last School City Name When Not Same
-    char stu_last_address_state[100];               // Last School State Name When Not Same
-    
-    char stu_last_session_year[10];                 // Last Session Year in 'YYYY-YYYY' Format
-    char stu_academic_year[11];                      // Current Session Year in 'YYYY-YYYY' Foramt
+    char stu_subjects[MAX_SUBJECTS][SUBJECT_LEN]; // Subjects Enrolled to student
+    int stu_subject_count;                        // Number of subject Enrolled
+
+    float stu_last_percentage; // Last Year Percentage
+    char stu_last_school[100]; // Last School Name
+
+    char stu_last_address_street[100]; // Last School Street Name When Not Same
+    char stu_last_address_area[100];   // Last School Area Name When Not Same
+    char stu_last_address_city[100];   // Last School City Name When Not Same
+    char stu_last_address_state[100];  // Last School State Name When Not Same
+
+    char stu_last_session_year[10]; // Last Session Year in 'YYYY-YYYY' Format
+    char stu_academic_year[11];     // Current Session Year in 'YYYY-YYYY' Foramt
 };
-
 
 // Dashboard (Main Menu)
 
-void main_menu(){
+void main_menu()
+{
     printf("\n=========================================================\n");
     printf("                  School Managment School                  \n");
     printf("\n=========================================================\n");
@@ -91,7 +89,8 @@ void main_menu(){
 
 // Student Dashboard
 
-void student_dashboard(){
+void student_dashboard()
+{
     printf("\n=========================================================\n");
     printf("                     Student Dashboard                     \n");
     printf("\n=========================================================\n");
@@ -126,23 +125,25 @@ int readInt(int *var)
 
 // Gennerate Registration Number
 
-int generate_registration_number(){
+int generate_registration_number()
+{
     FILE *fp;
     struct student_info st_info;
 
     fp = fopen("Student_information.dat", "rb");
 
     // If File not exist -> First Student
-    if (fp==NULL)
+    if (fp == NULL)
     {
         return 1000;
     }
-    
+
     // Go To End of File
-    fseek(fp, 0 , SEEK_END);
+    fseek(fp, 0, SEEK_END);
 
     // If File Is Empty
-    if (ftell(fp) == 0) {
+    if (ftell(fp) == 0)
+    {
         fclose(fp);
         return 1000;
     }
@@ -151,29 +152,32 @@ int generate_registration_number(){
     fseek(fp, -sizeof(struct student_info), SEEK_END);
 
     // Read last student
-    if (fread(&st_info, sizeof(struct student_info), 1, fp) != 1) {
+    if (fread(&st_info, sizeof(struct student_info), 1, fp) != 1)
+    {
         fclose(fp);
         return 1000;
     }
 
-
-    //Close File
+    // Close File
     fclose(fp);
 
-    return st_info.Stu_registration_number+1;
+    return st_info.Stu_registration_number + 1;
 }
 
 // Function For required Inputs
 
-void readrequiredstring(const char *msg, char *str, int size) {
-    do {
+void readrequiredstring(const char *msg, char *str, int size)
+{
+    do
+    {
         printf("%s", msg);
         fgets(str, size, stdin);
 
         // remove newline character
         str[strcspn(str, "\n")] = '\0';
 
-        if (strlen(str) == 0) {
+        if (strlen(str) == 0)
+        {
             printf("This field is required. Please enter a value.\n");
         }
 
@@ -182,7 +186,8 @@ void readrequiredstring(const char *msg, char *str, int size) {
 
 // Function For Optional Inputs
 
-void readoptionalstring(const char *msg, char *str, int size) {
+void readoptionalstring(const char *msg, char *str, int size)
+{
     printf("%s", msg);
     fgets(str, size, stdin);
 
@@ -192,10 +197,11 @@ void readoptionalstring(const char *msg, char *str, int size) {
 
 // Checks Gender
 
-void readgender(char *msg, char *str,int size){
+void readgender(char *msg, char *str, int size)
+{
     while (1)
     {
-        printf("%s",msg);
+        printf("%s", msg);
         if (fgets(str, size, stdin) == NULL)
             continue;
 
@@ -203,27 +209,28 @@ void readgender(char *msg, char *str,int size){
         str[strcspn(str, "\n")] = '\0';
 
         // Make the Lenght Only 1
-        if (strlen(str)!=1)
+        if (strlen(str) != 1)
         {
             printf("Enter Gender in The Format - 'M'/'F'/'O'\n ");
             continue;
         }
-        
+
         // Make the Character in Uppercase
         str[0] = toupper((unsigned char)str[0]);
 
-        if (str[0]!='M' && str[0]!='F' && str[0]!='O')
+        if (str[0] != 'M' && str[0] != 'F' && str[0] != 'O')
         {
             printf("Enter Gender in The Format - 'M'/'F'/'O'\n ");
             continue;
         }
-        return;                                      // Valid input
+        return; // Valid input
     }
 }
 
 // Checks Caste
 
-void readcaste(char *msg, char *str, int size){
+void readcaste(char *msg, char *str, int size)
+{
     while (1)
     {
         printf("%s", msg);
@@ -235,41 +242,42 @@ void readcaste(char *msg, char *str, int size){
         str[strcspn(str, "\n")] = '\0';
 
         // Convert to uppercase
-        for (int i = 0; str[i] != '\0'; i++) {
+        for (int i = 0; str[i] != '\0'; i++)
+        {
             str[i] = toupper((unsigned char)str[i]);
         }
 
         // Validate caste
         if (strcmp(str, "GEN") == 0 ||
             strcmp(str, "OBC") == 0 ||
-            strcmp(str, "SC")  == 0 ||
-            strcmp(str, "ST")  == 0)
+            strcmp(str, "SC") == 0 ||
+            strcmp(str, "ST") == 0)
         {
-            return;   // valid input → exit function
+            return; // valid input → exit function
         }
 
         printf("Invalid Caste! Please Enter Gen, OBC, SC or ST.\n");
     }
-    
 }
 
 // Checks Email Address
 
-void readmail(char *msg,char *str,int size){
+void readmail(char *msg, char *str, int size)
+{
     while (1)
-    {   
-        printf("%s",msg);
+    {
+        printf("%s", msg);
 
         if (fgets(str, size, stdin) == NULL)
             continue;
-        
+
         // Remove newline
         str[strcspn(str, "\n")] = '\0';
 
         // Check if "@gmail.com" exists
         if (strstr(str, "@gmail.com") != NULL)
         {
-            return;   // valid email → exit function
+            return; // valid email → exit function
         }
 
         printf("Invalid Email Address!\n");
@@ -278,31 +286,32 @@ void readmail(char *msg,char *str,int size){
 
 // Checks Mobile Number
 
-void readmobilenumber(char *msg,char *str,int size){
+void readmobilenumber(char *msg, char *str, int size)
+{
     while (1)
     {
-        printf("%s",msg);
+        printf("%s", msg);
 
         if (fgets(str, size, stdin) == NULL)
             continue;
-        
+
         // Remove newline
         str[strcspn(str, "\n")] = '\0';
 
         // Length must be exactly 10
-        if (strlen(str)!=10)
+        if (strlen(str) != 10)
         {
             printf("Invalid Mobile Number\n");
             continue;
         }
 
         // First digit check (Indian numbers)
-        if (str[0]<'6' || str[0]>'9')
+        if (str[0] < '6' || str[0] > '9')
         {
             printf("Invalid Mobile Number\n");
             continue;
         }
-        
+
         // All characters must be digits
         int valid = 1;
         for (int i = 0; i < 10; i++)
@@ -326,7 +335,8 @@ void readmobilenumber(char *msg,char *str,int size){
 
 // Checks Zipcode
 
-void readzipcode(char *msg, int *zipcode_number){
+void readzipcode(char *msg, int *zipcode_number)
+{
     while (1)
     {
         printf("%s", msg);
@@ -336,7 +346,8 @@ void readzipcode(char *msg, int *zipcode_number){
             printf("Invalid input! Enter numbers only.\n");
 
             // Clear input buffer
-            while (getchar() != '\n');
+            while (getchar() != '\n')
+                ;
             continue;
         }
 
@@ -347,17 +358,17 @@ void readzipcode(char *msg, int *zipcode_number){
         }
 
         // Clear leftover newline
-        while (getchar() != '\n');
+        while (getchar() != '\n')
+            ;
 
-        return;   // valid zipcode
-        
+        return; // valid zipcode
     }
-    
 }
 
 // Generate School Gmail Id
 
-void generate_student_email(char *firstname, char *lastname, int reg_num,char *email,int size){
+void generate_student_email(char *firstname, char *lastname, int reg_num, char *email, int size)
+{
     char fname[50], lname[50];
 
     // Copy names safely
@@ -380,13 +391,15 @@ void generate_student_email(char *firstname, char *lastname, int reg_num,char *e
 
 // Add Student Personal Info
 
-void add_student_personal_info(){
+void add_student_personal_info()
+{
     FILE *fp;
     struct student_info st_in;
     int ch;
 
     // clear buffer safely
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
 
     fp = fopen("Student_academic.dat", "ab");
     if (fp == NULL)
@@ -398,34 +411,33 @@ void add_student_personal_info(){
     // Registration Number
     st_in.Stu_registration_number = generate_registration_number();
 
-    readrequiredstring("Enter First Name : ", st_in.stu_firstname,sizeof(st_in.stu_firstname));                             // Enter First Name
-    readoptionalstring("Enter Middle Name : ",st_in.stu_middlename,sizeof(st_in.stu_middlename));                           // Enter Middle Name
-    readrequiredstring("Enter Last Name : ",st_in.stu_lastname,sizeof(st_in.stu_lastname));                                 // Enter Last Name
-    readrequiredstring("Enter Father's Name : ",st_in.stu_fathername,sizeof(st_in.stu_fathername));                         // Enter Father's Name
-    readrequiredstring("Enter Mother's Name : ",st_in.stu_mothername,sizeof(st_in.stu_mothername));                         // Enter Mother's Name
-    readrequiredstring("Enter Father's Occupation : ",st_in.stu_father_occu,sizeof(st_in.stu_father_occu));                 // Enter Father's Occupation
-    readrequiredstring("Enter Mother's Occupation : ",st_in.stu_mother_occu,sizeof(st_in.stu_mother_occu));                 // Enter Mother's Occupation
-    readrequiredstring("Enter D.O.B (DD/MM/YYYY): ",st_in.stu_dob,sizeof(st_in.stu_dob));                                   // Enter DOB in DD/MM//YYYY Format
-    readgender("Enter Gender (M/F/O) : ",st_in.stu_gender,sizeof(st_in.stu_gender));                                                                 // Enter Gender in 'M'/'F'/'O'
-    readcaste("Enter Caste (Gen/OBC/SC/ST) : ",st_in.stu_caste,sizeof(st_in.stu_caste));                                    // Enter Caste - 'OBC'/'GEN'/'ST'/'SC'
-    readmail("Enter Gmail Address : ",st_in.stu_email,sizeof(st_in.stu_email));                                             // Enter Personal Gmail Address
-    readmobilenumber("Enter Mobile Number : ",st_in.stu_mobile_number,sizeof(st_in.stu_mobile_number));                     // Enter Student Mobile Number
-    readmobilenumber("Enter Father's Mobile Number : ",st_in.stu_father_number,sizeof(st_in.stu_father_number));            // Enter Father's Mobile Number
-    readrequiredstring("Enter Street Name : ",st_in.stu_street,sizeof(st_in.stu_street));                                   // Enter Street Name
-    readrequiredstring("Enter Area : ",st_in.stu_area,sizeof(st_in.stu_area));                                              // Enter Area Name
-    readrequiredstring("Enter City Name : ",st_in.stu_city,sizeof(st_in.stu_city));                                         // Enter City Name
-    readrequiredstring("Enter State : ",st_in.stu_state,sizeof(st_in.stu_state));                                           // Enter State
-    readzipcode("Enter Zipcode : ",&st_in.stu_zipcode);                                                                      // Enter Zipcode in 6 digit only
-    
-    generate_student_email(                                                                                                 // School Gmail Id (Autogenerate)
+    readrequiredstring("Enter First Name : ", st_in.stu_firstname, sizeof(st_in.stu_firstname));                   // Enter First Name
+    readoptionalstring("Enter Middle Name : ", st_in.stu_middlename, sizeof(st_in.stu_middlename));                // Enter Middle Name
+    readrequiredstring("Enter Last Name : ", st_in.stu_lastname, sizeof(st_in.stu_lastname));                      // Enter Last Name
+    readrequiredstring("Enter Father's Name : ", st_in.stu_fathername, sizeof(st_in.stu_fathername));              // Enter Father's Name
+    readrequiredstring("Enter Mother's Name : ", st_in.stu_mothername, sizeof(st_in.stu_mothername));              // Enter Mother's Name
+    readrequiredstring("Enter Father's Occupation : ", st_in.stu_father_occu, sizeof(st_in.stu_father_occu));      // Enter Father's Occupation
+    readrequiredstring("Enter Mother's Occupation : ", st_in.stu_mother_occu, sizeof(st_in.stu_mother_occu));      // Enter Mother's Occupation
+    readrequiredstring("Enter D.O.B (DD/MM/YYYY): ", st_in.stu_dob, sizeof(st_in.stu_dob));                        // Enter DOB in DD/MM//YYYY Format
+    readgender("Enter Gender (M/F/O) : ", st_in.stu_gender, sizeof(st_in.stu_gender));                             // Enter Gender in 'M'/'F'/'O'
+    readcaste("Enter Caste (Gen/OBC/SC/ST) : ", st_in.stu_caste, sizeof(st_in.stu_caste));                         // Enter Caste - 'OBC'/'GEN'/'ST'/'SC'
+    readmail("Enter Gmail Address : ", st_in.stu_email, sizeof(st_in.stu_email));                                  // Enter Personal Gmail Address
+    readmobilenumber("Enter Mobile Number : ", st_in.stu_mobile_number, sizeof(st_in.stu_mobile_number));          // Enter Student Mobile Number
+    readmobilenumber("Enter Father's Mobile Number : ", st_in.stu_father_number, sizeof(st_in.stu_father_number)); // Enter Father's Mobile Number
+    readrequiredstring("Enter Street Name : ", st_in.stu_street, sizeof(st_in.stu_street));                        // Enter Street Name
+    readrequiredstring("Enter Area : ", st_in.stu_area, sizeof(st_in.stu_area));                                   // Enter Area Name
+    readrequiredstring("Enter City Name : ", st_in.stu_city, sizeof(st_in.stu_city));                              // Enter City Name
+    readrequiredstring("Enter State : ", st_in.stu_state, sizeof(st_in.stu_state));                                // Enter State
+    readzipcode("Enter Zipcode : ", &st_in.stu_zipcode);                                                           // Enter Zipcode in 6 digit only
+
+    generate_student_email( // School Gmail Id (Autogenerate)
         st_in.stu_firstname,
         st_in.stu_lastname,
         st_in.Stu_registration_number,
         st_in.Stu_School_email,
-        sizeof(st_in.Stu_School_email)
-    );
-    printf("Generated Registration Number : %d\n",st_in.Stu_registration_number);
-    printf("Generated School Gmail Id : %s",st_in.Stu_School_email);
+        sizeof(st_in.Stu_School_email));
+    printf("Generated Registration Number : %d\n", st_in.Stu_registration_number);
+    printf("Generated School Gmail Id : %s", st_in.Stu_School_email);
     fp = fopen("Student_information.dat", "ab");
     if (fp == NULL)
     {
@@ -439,6 +451,57 @@ void add_student_personal_info(){
 
 // ========================== add_student_academic_info Function Items ==========================
 
+// Assign the Section
+
+int is_split_needed(int stu_class)
+{
+    FILE *fp;
+    struct add_student_academic_data st;
+    int countA = 0;
+
+    fp = fopen("Student_academic.dat", "rb");
+    if (!fp) return 0;
+
+    while (fread(&st, sizeof(st), 1, fp))
+    {
+        if (st.stu_class == stu_class && st.stu_section == 'A')
+            countA++;
+    }
+
+    fclose(fp);
+    return countA >= 40;
+}
+
+// Checks Class
+
+void readclass(const char *msg, int *stu_class)
+{
+    int ch;
+
+    while (1)
+    {
+        printf("%s", msg);
+
+        if (scanf("%d", stu_class) != 1)
+        {
+            printf("Invalid input! Please enter a number.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            continue;
+        }
+
+        // clear buffer
+        while ((ch = getchar()) != '\n' && ch != EOF);
+
+        if (*stu_class < 1 || *stu_class > 12)
+        {
+            printf("Invalid class! Enter class between 1 and 12.\n");
+            continue;
+        }
+
+        return;   // valid input
+    }
+}
+
 // Autogenerate Section
 
 char auto_generate_section(int stu_class)
@@ -450,7 +513,7 @@ char auto_generate_section(int stu_class)
 
     fp = fopen("Student_academic.dat", "rb");
     if (fp == NULL)
-        return 'A';   // first student of this class
+        return 'A'; // first student of this class
 
     while (fread(&st, sizeof(st), 1, fp))
     {
@@ -478,16 +541,58 @@ char auto_generate_section(int stu_class)
     return max_section + 1;
 }
 
+// Split Section
+
+void split_section(int stu_class, char section)
+{
+    FILE *fp, *temp;
+    struct add_student_academic_data st;
+    int count = 0;
+
+    fp = fopen("Student_academic.dat", "rb");
+    temp = fopen("temp_academic.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: Unable to split section.\n");
+        return;
+    }
+
+    while (fread(&st, sizeof(st), 1, fp))
+    {
+        if (st.stu_class == stu_class && st.stu_section == section)
+        {
+            count++;
+
+            // Move last 10 students to next section
+            if (count > 30)
+            {
+                st.stu_section = section + 1;   // A → B
+            }
+        }
+
+        fwrite(&st, sizeof(st), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    // Replace old file with updated file
+    remove("Student_academic.dat");
+    rename("temp_academic.dat", "Student_academic.dat");
+}
+
 // Student Academic Info
 
-void add_student_academic_info(){
+void add_student_academic_info()
+{
     FILE *fp;
     struct add_student_academic_data st_academic;
     int ch;
 
     // clear buffer safely
-    while ((ch = getchar())!= '\n' && ch!= EOF);
-    
+    while ((ch = getchar()) != '\n' && ch != EOF);
+
     fp = fopen("Student_academic.dat", "ab");
     if (fp == NULL)
     {
@@ -497,37 +602,48 @@ void add_student_academic_info(){
 
     // Connecting Both the Files Student_Information and Student_Academic
     printf("Enter Registration Number : ");
-    scanf("%d",&st_academic.stu_registration_number);
+    scanf("%d", &st_academic.stu_registration_number);
 
     // clear buffer safely
-    while ((ch = getchar())!= '\n' && ch!= EOF);
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
     readclass("Enter Class : ", &st_academic.stu_class);
+
+    if (is_split_needed(st_academic.stu_class))
+    {
+        split_section(st_academic.stu_class, 'A');
+    }
 
     // Autogenerate Section
     st_academic.stu_section = auto_generate_section(st_academic.stu_class);
 
-    if (st_academic.stu_class>10)
+    if (st_academic.stu_class > 10)
     {
-        readstream("Enter Stream (PCM/PCB/PCMB/COMMERCE/ARTS) : ",st_academic.stream,sizeof(st_academic.stream));
+        readstream("Enter Stream (PCM/PCB/PCMB/COMMERCE/ARTS) : ", st_academic.stream, sizeof(st_academic.stream));
     }
     else
     {
         strcpy(st_academic.stream, "NA");
     }
 
-    st_academic.stu_subject_count = auto_assign_subject(st_academic.stu_class,st_academic.stu_subjects);
+    // Autoassign Subjects
+    st_academic.stu_subject_count = auto_assign_subject(st_academic.stu_class, st_academic.stu_subjects);
 
+    // Last Year Percentage
     printf("Enter Last Year Percentage : ");
     scanf("%f", &st_academic.stu_last_percentage);
 
+    // clear buffer safely
     while ((ch = getchar()) != '\n' && ch != EOF);
 
-    readrequiredstring("Enter Last School Name : ",st_academic.stu_last_school,sizeof(st_academic.stu_last_school));
+    // Last School Name
+    readschool("Enter Last School Name : ", st_academic.stu_last_school, sizeof(st_academic.stu_last_school));
 
-    readsession("Enter Last Session Year : ",st_academic.stu_last_session_year,sizeof(st_academic.stu_last_session_year));
+    // Last Session Year in Format 'YYYY-YYYY'
+    readsession("Enter Last Session Year : ", st_academic.stu_last_session_year, sizeof(st_academic.stu_last_session_year));
 
-    readsession("Enter Currect Session Year : ",st_academic.stu_academic_year,sizeof(st_academic.stu_academic_year));
+    // Current Session Year in Format 'YYYY-YYYY'
+    readsession("Enter Currect Session Year : ", st_academic.stu_academic_year, sizeof(st_academic.stu_academic_year));
 
     fwrite(&st_academic, sizeof(st_academic), 1, fp);
     fclose(fp);
@@ -535,62 +651,62 @@ void add_student_academic_info(){
 
 // Student Feature Select
 
-void student_features(int feature_choice){
+void student_features(int feature_choice)
+{
     switch (feature_choice)
     {
     case 1:
-        add_student_personal_info();                // Add Student Personal Information
+        add_student_personal_info(); // Add Student Personal Information
         break;
     case 2:
-        add_student_academic_info();                // Add Student Academic Information
+        add_student_academic_info(); // Add Student Academic Information
         break;
     case 3:
         see_student_academic_details();
     case 4:
-        update_student_info();                      // Update Student Information
+        update_student_info(); // Update Student Information
         break;
     case 5:
-        view_all_students();                        // View All Students
+        view_all_students(); // View All Students
         break;
     case 6:
-        view_course_teacher();                      // View Course and Teacher Enrolled of a Student
+        view_course_teacher(); // View Course and Teacher Enrolled of a Student
         break;
     case 7:
-        search_student();                           // Search Student according to - id, Registration number, gmail, name etc.
+        search_student(); // Search Student according to - id, Registration number, gmail, name etc.
         break;
     case 8:
-        sort_student_record();                      // Sort all Student Details by name, registration number, etc.
+        sort_student_record(); // Sort all Student Details by name, registration number, etc.
         break;
     case 9:
-        view_student_result();                      // View Student Result
+        view_student_result(); // View Student Result
         break;
     case 10:
-        count_total_student();                      // View number of students in school, class and section
+        count_total_student(); // View number of students in school, class and section
         break;
     case 11:
-        delete_student();                           // Delete Student Detail
+        delete_student(); // Delete Student Detail
         break;
     case 12:
-        printf("Exiting....\n");                    // Exit Student Feature
+        printf("Exiting....\n"); // Exit Student Feature
         break;
     default:
-        printf("Invalid Choice! Try Again.\n");     // Invalid Choice
+        printf("Invalid Choice! Try Again.\n"); // Invalid Choice
         break;
     }
 }
 
-
-
 // Main Function
-int main(){
-    int dashboard_option,student_option;
-    while (dashboard_option!=4)
+int main()
+{
+    int dashboard_option, student_option;
+    while (dashboard_option != 4)
     {
 
         // Calling main Dashboard Function
         main_menu();
         printf("Enter Dashboard (1,2,3,4) : ");
-        
+
         // Invalid Option Check
 
         if (!readInt(&dashboard_option))
@@ -599,11 +715,11 @@ int main(){
         }
 
         // Switch Case to Select Dashboard
-        
+
         switch (dashboard_option)
         {
         case 1:
-        // Calling Student Dashboard
+            // Calling Student Dashboard
             student_dashboard();
 
             printf("Enter your choice = ");
@@ -614,11 +730,11 @@ int main(){
             {
                 continue;
             }
-            while (student_dashboard!=12)
+            while (student_dashboard != 12)
             {
                 student_Features(student_dashboard);
             }
-            
+
             break;
         case 2:
             teacher_dashboard();
