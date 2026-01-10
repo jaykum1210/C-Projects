@@ -582,6 +582,41 @@ void split_section(int stu_class, char section)
     rename("temp_academic.dat", "Student_academic.dat");
 }
 
+// Check School Name
+
+void readschool(char *msg, char *str, int size){
+    
+    const char *CURRENT_SCHOOL = "C PROJECT SCHOOL";
+    int len;
+    
+    do
+    {
+        printf("%s", msg);
+        fgets(str, size, stdin);
+
+        // remove newline character
+        str[strcspn(str, "\n")] = '\0';
+
+        if (strlen(str) == 0)
+        {
+            printf("This field is required. Please enter a value.\n");
+        }
+
+    } while (strlen(str) == 0);
+
+    int school_name_length = strlen(str);
+
+    for (int i = 0; i < school_name_length; i++)
+    {
+        str[i] = toupper((unsigned char)str[i]);
+    }
+    char school_name[50] = "C PROJECT SCHOOL";
+    if (strcmp(str,school_name)!=0)
+    {
+        readschooldetail();
+    }
+}
+
 // Student Academic Info
 
 void add_student_academic_info()
