@@ -71,7 +71,7 @@ struct add_student_academic_data
     char stu_last_address_state[100];  // Last School State Name When Not Same
 
     char stu_last_session_year[10]; // Last Session Year in 'YYYY-YYYY' Format
-    char stu_academic_year[11];     // Current Session Year in 'YYYY-YYYY' Foramt
+    char stu_academic_year[10];     // Current Session Year in 'YYYY-YYYY' Foramt
 };
 
 // Dashboard (Main Menu)
@@ -582,17 +582,76 @@ void split_section(int stu_class, char section)
     rename("temp_academic.dat", "Student_academic.dat");
 }
 
+// Read Year Session in format - 'YYYY-YYYY'
+
+void readsession(const char *msg, char *str, int size)
+{
+    while (1)
+    {
+        printf("%s", msg);
+
+        if (fgets(str, size, stdin) == NULL)
+            continue;
+
+        // Remove newline
+        str[strcspn(str, "\n")] = '\0';
+
+        // Length must be exactly 9 (YYYY-YYYY)
+        if (strlen(str) != 9)
+        {
+            printf("Invalid format! Use YYYY-YYYY\n");
+            continue;
+        }
+
+        int valid = 1;
+
+        for (int i = 0; i < 9; i++)
+        {
+            if (i == 4)
+            {
+                if (str[i] != '-')
+                {
+                    valid = 0;
+                    break;
+                }
+            }
+            else
+            {
+                if (!isdigit((unsigned char)str[i]))
+                {
+                    valid = 0;
+                    break;
+                }
+            }
+        }
+
+        if (valid)
+            return;
+
+        printf("Invalid format! Use YYYY-YYYY\n");
+    }
+}
+
+// Check the School Details If Same as C PROJECT SCHOOL
+
+void readschooldetail(struct add_student_academic_data *add_stu_aca_det){
+    readrequiredstring("Enter School Street : ",add_stu_aca_det->stu_last_address_street,sizeof(add_stu_aca_det->stu_last_address_street));
+    readrequiredstring("Enter School Area : ",add_stu_aca_det->stu_last_address_area,sizeof(add_stu_aca_det->stu_last_address_area));
+    readrequiredstring("Enter School City : ",add_stu_aca_det->stu_last_address_city,sizeof(add_stu_aca_det->stu_last_address_city));
+    readrequiredstring("Enter School State : ",add_stu_aca_det->stu_last_address_state,sizeof(add_stu_aca_det->stu_last_address_state));
+}
+
 // Check School Name
 
-void readschool(char *msg, char *str, int size){
-    
+void readschool(const char *msg, char *str, int size,struct add_student_academic_data *stu_last_detail)
+{
     const char *CURRENT_SCHOOL = "C PROJECT SCHOOL";
-    int len;
-    
     do
     {
         printf("%s", msg);
-        fgets(str, size, stdin);
+
+        if (fgets(str, size, stdin) == NULL)
+            continue;
 
         // remove newline character
         str[strcspn(str, "\n")] = '\0';
@@ -604,16 +663,22 @@ void readschool(char *msg, char *str, int size){
 
     } while (strlen(str) == 0);
 
-    int school_name_length = strlen(str);
-
-    for (int i = 0; i < school_name_length; i++)
+    // Convert to uppercase for comparison
+    for (int i = 0; str[i] != '\0'; i++)
     {
         str[i] = toupper((unsigned char)str[i]);
     }
-    char school_name[50] = "C PROJECT SCHOOL";
-    if (strcmp(str,school_name)!=0)
+
+    // If school is different, ask for address details
+    if (strcmp(str, CURRENT_SCHOOL) != 0)
     {
-        readschooldetail();
+        readschooldetail(stu_last_detail);
+    }
+    else{
+        strcpy(stu_last_detail->stu_last_address_street, "C Street");
+        strcpy(stu_last_detail->stu_last_address_area,"C Area");
+        strcpy(stu_last_detail->stu_last_address_city,"C City");
+        strcpy(stu_last_detail->stu_last_address_state,"C State");
     }
 }
 
@@ -672,7 +737,7 @@ void add_student_academic_info()
     while ((ch = getchar()) != '\n' && ch != EOF);
 
     // Last School Name
-    readschool("Enter Last School Name : ", st_academic.stu_last_school, sizeof(st_academic.stu_last_school));
+    readschool("Enter Last School Name : ", st_academic.stu_last_school, sizeof(st_academic.stu_last_school), &st_academic);
 
     // Last Session Year in Format 'YYYY-YYYY'
     readsession("Enter Last Session Year : ", st_academic.stu_last_session_year, sizeof(st_academic.stu_last_session_year));
