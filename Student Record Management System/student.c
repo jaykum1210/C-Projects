@@ -398,8 +398,7 @@ void add_student_personal_info()
     int ch;
 
     // clear buffer safely
-    while ((ch = getchar()) != '\n' && ch != EOF)
-        ;
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
     fp = fopen("Student_academic.dat", "ab");
     if (fp == NULL)
@@ -450,6 +449,29 @@ void add_student_personal_info()
 }
 
 // ========================== add_student_academic_info Function Items ==========================
+
+// Check Registration Number exist or not
+
+int check_registration_number_exist(int reg_number){
+    FILE *fp;
+    struct student_info stu_info;
+    fp = fopen("Student_information.dat", "rb");
+    if (fp == NULL)
+        return 0;   // no student file invalid
+
+    while (fread(&stu_info, sizeof(stu_info), 1, fp))
+    {
+        if (stu_info.Stu_registration_number == reg_number)
+        {
+            fclose(fp);
+            return 1;   // found
+        }
+    }
+
+    fclose(fp);
+    return 0;   // not found
+}
+
 
 // Assign the Section
 
@@ -688,7 +710,7 @@ void add_student_academic_info()
 {
     FILE *fp;
     struct add_student_academic_data st_academic;
-    int ch;
+    int ch,valid_reg = 0;
 
     // clear buffer safely
     while ((ch = getchar()) != '\n' && ch != EOF);
@@ -700,12 +722,28 @@ void add_student_academic_info()
         return;
     }
 
-    // Connecting Both the Files Student_Information and Student_Academic
-    printf("Enter Registration Number : ");
-    scanf("%d", &st_academic.stu_registration_number);
+ while (!valid_reg)
+    {
+        printf("Enter Registration Number : ");
 
-    // clear buffer safely
-    while ((ch = getchar()) != '\n' && ch != EOF);
+        if (scanf("%d", &st_academic.stu_registration_number) != 1)
+        {
+            printf("Invalid input! Enter numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            continue;
+        }
+
+        // clear buffer
+        while ((ch = getchar()) != '\n' && ch != EOF);
+
+        if (!check_registration_number_exist(st_academic.stu_registration_number))
+        {
+            printf("Registration number not found! Please enter a valid one.\n");
+            continue;
+        }
+
+        valid_reg = 1;   // exit loop
+    }
 
     readclass("Enter Class : ", &st_academic.stu_class);
 
@@ -747,6 +785,13 @@ void add_student_academic_info()
 
     fwrite(&st_academic, sizeof(st_academic), 1, fp);
     fclose(fp);
+}
+
+void see_student_academic_details(){
+    FILE *fp;
+    struct student_info st_in;
+    struct add_student_academic_data stu_aca_data;
+    
 }
 
 // Student Feature Select
@@ -795,6 +840,8 @@ void student_features(int feature_choice)
         break;
     }
 }
+
+// ========================== Main Function ==========================
 
 // Main Function
 int main()
