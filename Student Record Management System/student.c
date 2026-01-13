@@ -788,9 +788,32 @@ void add_student_academic_info()
 }
 
 void see_student_academic_details(){
-    FILE *fp;
+    FILE *fp1,*fp2;
+    int valid_reg = 0,ch;
     struct student_info st_in;
     struct add_student_academic_data stu_aca_data;
+    while (1)
+    {
+        printf("Enter Registration Number : ");
+
+        if (scanf("%d", &stu_aca_data.stu_registration_number) != 1)
+        {
+            printf("Invalid input! Enter numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            continue;
+        }
+
+        // clear buffer
+        while ((ch = getchar()) != '\n' && ch != EOF);
+
+        if (!check_registration_number_exist(stu_aca_data.stu_registration_number))
+        {
+            printf("Registration number not found! Please enter a valid one.\n");
+            continue;
+        }
+        
+        valid_reg = 1;   // exit loop
+    }
     
 }
 
