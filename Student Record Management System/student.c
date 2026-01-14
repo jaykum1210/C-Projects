@@ -1598,6 +1598,10 @@ void update_student_info()
     }
 }
 
+// ========================== See Student Academic Deatils Function Items==========================
+
+// 
+
 // Student Feature Select
 
 void student_features(int feature_choice)
