@@ -196,6 +196,73 @@ void readoptionalstring(const char *msg, char *str, int size)
     str[strcspn(str, "\n")] = '\0';
 }
 
+// Checks DOB in format "DD/MM/YYYY"
+
+void readdob(char *msg, char *str, int size)
+{
+    int day, month, year;
+
+    while (1)
+    {
+        printf("%s", msg);
+
+        if (fgets(str, size, stdin) == NULL)
+            continue;
+
+        // Remove newline
+        str[strcspn(str, "\n")] = '\0';
+
+        // Check length: DD/MM/YYYY → 10 chars
+        if (strlen(str) != 10)
+        {
+            printf("Invalid DOB format! Use DD/MM/YYYY\n");
+            continue;
+        }
+
+        // Check separators
+        if (str[2] != '/' || str[5] != '/')
+        {
+            printf("Invalid DOB format! Use DD/MM/YYYY\n");
+            continue;
+        }
+
+        // Check digits
+        for (int i = 0; i < 10; i++)
+        {
+            if (i == 2 || i == 5)
+                continue;
+
+            if (!isdigit((unsigned char)str[i]))
+            {
+                printf("Invalid DOB format! Use DD/MM/YYYY\n");
+                goto retry;
+            }
+        }
+
+        // Extract values
+        day = (str[0] - '0') * 10 + (str[1] - '0');
+        month = (str[3] - '0') * 10 + (str[4] - '0');
+        year = (str[6] - '0') * 1000 +
+               (str[7] - '0') * 100 +
+               (str[8] - '0') * 10 +
+               (str[9] - '0');
+
+        // Validate ranges
+        if (day < 1 || day > 31 ||
+            month < 1 || month > 12 ||
+            year < 1900 || year > 2100)
+        {
+            printf("Invalid DOB values!\n");
+            continue;
+        }
+
+        return; // VALID DOB
+
+    retry:
+        continue;
+    }
+}
+
 // Checks Gender
 
 void readgender(char *msg, char *str, int size)
@@ -419,7 +486,7 @@ void add_student_personal_info()
     readrequiredstring("Enter Mother's Name : ", st_in.stu_mothername, sizeof(st_in.stu_mothername));              // Enter Mother's Name
     readrequiredstring("Enter Father's Occupation : ", st_in.stu_father_occu, sizeof(st_in.stu_father_occu));      // Enter Father's Occupation
     readrequiredstring("Enter Mother's Occupation : ", st_in.stu_mother_occu, sizeof(st_in.stu_mother_occu));      // Enter Mother's Occupation
-    readrequiredstring("Enter D.O.B (DD/MM/YYYY): ", st_in.stu_dob, sizeof(st_in.stu_dob));                        // Enter DOB in DD/MM//YYYY Format
+    readdob("Enter D.O.B (DD/MM/YYYY): ", st_in.stu_dob, sizeof(st_in.stu_dob));                                   // Enter DOB in DD/MM//YYYY Format
     readgender("Enter Gender (M/F/O) : ", st_in.stu_gender, sizeof(st_in.stu_gender));                             // Enter Gender in 'M'/'F'/'O'
     readcaste("Enter Caste (Gen/OBC/SC/ST) : ", st_in.stu_caste, sizeof(st_in.stu_caste));                         // Enter Caste - 'OBC'/'GEN'/'ST'/'SC'
     readmail("Enter Gmail Address : ", st_in.stu_email, sizeof(st_in.stu_email));                                  // Enter Personal Gmail Address
@@ -813,7 +880,8 @@ int confirm_yes_no(const char *msg)
         scanf("%9s", choice);
 
         // clear input buffer
-        while ((ch = getchar()) != '\n' && ch != EOF);
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
 
         // convert to uppercase
         for (int i = 0; choice[i]; i++)
@@ -828,7 +896,6 @@ int confirm_yes_no(const char *msg)
         printf("Invalid input! Enter YES or NO.\n");
     }
 }
-
 
 // Search Student Information by Registration Number
 
@@ -964,26 +1031,15 @@ void see_student_academic_details()
 
         while (1)
         {
-            printf("Search another student? (YES/NO): ");
-            scanf("%9s", choice);
+            int check = confirm_yes_no("Serach Another Student (Yes/No)? : ");
 
-            while ((ch = getchar()) != '\n' && ch != EOF);
-
-            // Convert to uppercase
-            for (int i = 0; choice[i]; i++)
-                choice[i] = toupper((unsigned char)choice[i]);
-
-            if (strcmp(choice, "YES") == 0)
+            if (check == 1)
             {
-                break; // go back to main loop (ask reg number again)
-            }
-            else if (strcmp(choice, "NO") == 0)
-            {
-                return; // exit function completely
+                break;
             }
             else
             {
-                printf("Invalid input! Please enter YES or NO.\n");  // loop continues automatically
+                return;
             }
         }
     }
@@ -991,7 +1047,8 @@ void see_student_academic_details()
 
 // ========================== See Student Academic Deatils Function Items==========================
 
-void update_student_information(struct student_info *stu_info){
+void update_student_information()
+{
     printf("1. Student Name\n");
     printf("2. Father Name\n");
     printf("3. Mother Name\n");
@@ -1007,73 +1064,538 @@ void update_student_information(struct student_info *stu_info){
     printf("13. Exit\n");
 }
 
-// Update Student Information
+// Update Student Name
 
-void update_student_info(){
-    int ch, registration_number,update_option = 0;
+void update_student_name(int reg_no)
+{
+    FILE *fp, *temp;
+    struct student_info st_info;
+    int found = 0;
+    fp = fopen("Student_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+
+    while (fread(&st_info, sizeof(st_info), 1, fp))
+    {
+        if (st_info.Stu_registration_number == reg_no)
+        {
+            found = 1;
+            readrequiredstring("Enter First Name : ", st_info.stu_firstname, sizeof(st_info.stu_firstname));
+            readoptionalstring("Enter Middle Name : ", st_info.stu_middlename, sizeof(st_info.stu_middlename));
+            readrequiredstring("Enter Last Name : ", st_info.stu_lastname, sizeof(st_info.stu_lastname));
+        }
+        fwrite(&st_info, sizeof(st_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+        return;
+    }
+    remove("Student_information.dat");
+    rename("temp.dat", "Student_information.dat");
+}
+
+// Update Father Name
+
+void update_father_name(int reg_no)
+{
+    FILE *fp, *temp;
+    struct student_info st_info;
+    int found = 0;
+    fp = fopen("Student_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+    while (fread(&st_info, sizeof(st_info), 1, fp))
+    {
+        if (st_info.Stu_registration_number == reg_no)
+        {
+            found = 1;
+            readrequiredstring("Enter Father Name : ", st_info.stu_fathername, sizeof(st_info.stu_fathername));
+        }
+        fwrite(&st_info, sizeof(st_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+        return;
+    }
+    remove("Student_information.dat");
+    rename("temp.dat", "Student_information.dat");
+}
+
+// Update Mother Name
+
+void update_mother_name(int reg_no)
+{
+    FILE *fp, *temp;
+    struct student_info st_info;
+    int found = 0;
+    fp = fopen("Student_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+    while (fread(&st_info, sizeof(st_info), 1, fp))
+    {
+        if (st_info.Stu_registration_number == reg_no)
+        {
+            found = 1;
+            readrequiredstring("Enter Mother Name : ", st_info.stu_mothername, sizeof(st_info.stu_mothername));
+        }
+        fwrite(&st_info, sizeof(st_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+        return;
+    }
+    remove("Student_information.dat");
+    rename("temp.dat", "Student_information.dat");
+}
+
+void update_father_occupation(int reg_no)
+{
+    FILE *fp, *temp;
+    struct student_info st_info;
+    int found = 0;
+    fp = fopen("Student_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+    while (fread(&st_info, sizeof(st_info), 1, fp))
+    {
+        if (st_info.Stu_registration_number == reg_no)
+        {
+            found = 1;
+            readrequiredstring("Enter Father Occupation : ", st_info.stu_father_occu, sizeof(st_info.stu_father_occu));
+        }
+        fwrite(&st_info, sizeof(st_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+        return;
+    }
+    remove("Student_information.dat");
+    rename("temp.dat", "Student_information.dat");
+}
+
+// Update Mother Occupation
+
+void update_mother_occupation(int reg_no)
+{
+    FILE *fp, *temp;
+    struct student_info st_info;
+    int found = 0;
+    fp = fopen("Student_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+    while (fread(&st_info, sizeof(st_info), 1, fp))
+    {
+        if (st_info.Stu_registration_number == reg_no)
+        {
+            found = 1;
+            readrequiredstring("Enter Mother Occupation : ", st_info.stu_mother_occu, sizeof(st_info.stu_mother_occu));
+        }
+        fwrite(&st_info, sizeof(st_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+        return;
+    }
+    remove("Student_information.dat");
+    rename("temp.dat", "Student_information.dat");
+}
+
+// Update DOB
+
+void update_dob(int reg_no)
+{
+    FILE *fp, *temp;
+    struct student_info st_info;
+    int found = 0;
+    fp = fopen("Student_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+    while (fread(&st_info, sizeof(st_info), 1, fp))
+    {
+        if (st_info.Stu_registration_number == reg_no)
+        {
+            found = 1;
+            readdob("Enter DOB (DD/MM/YYYY) : ", st_info.stu_dob, sizeof(st_info.stu_dob));
+        }
+        fwrite(&st_info, sizeof(st_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+        return;
+    }
+    remove("Student_information.dat");
+    rename("temp.dat", "Student_information.dat");
+}
+
+// Update Gender
+
+void update_gender(int reg_no)
+{
+    FILE *fp, *temp;
+    struct student_info st_info;
+    int found = 0;
+    fp = fopen("Student_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+    while (fread(&st_info, sizeof(st_info), 1, fp))
+    {
+        if (st_info.Stu_registration_number == reg_no)
+        {
+            found = 1;
+            readgender("Enter Gender : ", st_info.stu_gender, sizeof(st_info.stu_gender));
+        }
+        fwrite(&st_info, sizeof(st_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+        return;
+    }
+    remove("Student_information.dat");
+    rename("temp.dat", "Student_information.dat");
+}
+
+// Update Caste
+
+void update_caste(int reg_no)
+{
+    FILE *fp, *temp;
+    struct student_info st_info;
+    int found = 0;
+    fp = fopen("Student_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+    while (fread(&st_info, sizeof(st_info), 1, fp))
+    {
+        if (st_info.Stu_registration_number == reg_no)
+        {
+            found = 1;
+            readcaste("Enter Caste : ", st_info.stu_caste, sizeof(st_info.stu_caste));
+        }
+        fwrite(&st_info, sizeof(st_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+        return;
+    }
+    remove("Student_information.dat");
+    rename("temp.dat", "Student_information.dat");
+}
+
+// Update Student Personal Email Id
+
+void update_student_email(int reg_no)
+{
+    FILE *fp, *temp;
+    struct student_info st_info;
+    int found = 0;
+    fp = fopen("Student_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+    while (fread(&st_info, sizeof(st_info), 1, fp))
+    {
+        if (st_info.Stu_registration_number == reg_no)
+        {
+            found = 1;
+            readmail("Enter Email Id : ", st_info.stu_email, sizeof(st_info.stu_email));
+        }
+        fwrite(&st_info, sizeof(st_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+        return;
+    }
+    remove("Student_information.dat");
+    rename("temp.dat", "Student_information.dat");
+}
+
+// Update Student Mobile Number
+
+void update_student_mobile_number(int reg_no)
+{
+    FILE *fp, *temp;
+    struct student_info st_info;
+    int found = 0;
+    fp = fopen("Student_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+    while (fread(&st_info, sizeof(st_info), 1, fp))
+    {
+        if (st_info.Stu_registration_number == reg_no)
+        {
+            found = 1;
+            readmobilenumber("Enter Student Movile Number : ", st_info.stu_mobile_number, sizeof(st_info.stu_mobile_number));
+        }
+        fwrite(&st_info, sizeof(st_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+        return;
+    }
+    remove("Student_information.dat");
+    rename("temp.dat", "Student_information.dat");
+}
+
+// Update Father Mobile Number
+
+void update_father_mobile_number(int reg_no)
+{
+    FILE *fp, *temp;
+    struct student_info st_info;
+    int found = 0;
+    fp = fopen("Student_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+    while (fread(&st_info, sizeof(st_info), 1, fp))
+    {
+        if (st_info.Stu_registration_number == reg_no)
+        {
+            found = 1;
+            readmobilenumber("Enter Father Mobile Number : ", st_info.stu_father_number, sizeof(st_info.stu_father_number));
+        }
+        fwrite(&st_info, sizeof(st_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+        return;
+    }
+    remove("Student_information.dat");
+    rename("temp.dat", "Student_information.dat");
+}
+
+// Update Address
+
+void update_address(int reg_no)
+{
+    FILE *fp, *temp;
+    struct student_info st_info;
+    int found = 0;
+    fp = fopen("Student_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+    while (fread(&st_info, sizeof(st_info), 1, fp))
+    {
+        if (st_info.Stu_registration_number == reg_no)
+        {
+            found = 1;
+            readrequiredstring("Enter Street Name : ", st_info.stu_street, sizeof(st_info.stu_street)); // Enter Street Name
+            readrequiredstring("Enter Area : ", st_info.stu_area, sizeof(st_info.stu_area));            // Enter Area Name
+            readrequiredstring("Enter City Name : ", st_info.stu_city, sizeof(st_info.stu_city));       // Enter City Name
+            readrequiredstring("Enter State : ", st_info.stu_state, sizeof(st_info.stu_state));         // Enter State
+            readzipcode("Enter Zipcode : ", &st_info.stu_zipcode);
+        }
+        fwrite(&st_info, sizeof(st_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+        return;
+    }
+    remove("Student_information.dat");
+    rename("temp.dat", "Student_information.dat");
+}
+
+// Update Student Information Function
+
+void update_student_info()
+{
+    int ch, update_option = 0, valid_reg = 0;
     struct student_info st_in;
     char ask_update[3];
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (!valid_reg)
+    {
+        printf("Enter Registration Number : ");
+
+        if (scanf("%d", &st_in.Stu_registration_number) != 1)
+        {
+            printf("Invalid input! Enter numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        // clear buffer
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
+        if (!check_registration_number_exist(st_in.Stu_registration_number))
+        {
+            printf("Registration number not found! Please enter a valid one.\n");
+            continue;
+        }
+
+        valid_reg = 1; // exit loop
+    }
+
     while (1)
     {
         printf("Choose Which Item You Want to Update\n");
-        update_student_information(&st_in);
-        while (1)
+        update_student_information();
+        printf("Enter option : ");
+
+        if (scanf("%d", &update_option) != 1)
         {
-            printf("Enter option : ");
-            scanf("%d",&update_option);
-            switch (update_option)
-            {
-            case 1:
-                update_student_name();
-                break;
-            case 2:
-                update_father_name();
-                break;
-            case 3:
-                update_mother_name();
-                break;
-            case 4:
-                update_father_occupation();
-                break;
-            case 5:
-                update_mother_occupation();
-                break;
-            case 6:
-                update_dob();
-                break;
-            case 7:
-                update_gender();
-                break;
-            case 8:
-                update_caste();
-                break;
-            case 9:
-                update_student_email();
-                break;
-            case 10:
-                update_student_mobile_number();
-                break;
-            case 11:
-                update_father_mobile_number();
-                break;
-            case 12:
-                update_address();
-                break;
-            case 13:
-                printf("Exiting...\n");
-                break;
-            default:
-                printf("Enter Valid Option\n");
-                break;
-            }
-
-            printf("Want to Update More Details (Yes/No) : ");
-            scanf("%s",&ask_update);
-
+            printf("Invalid input! Numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            continue;
         }
-        
+
+        // Clear Buffer
+        while ((ch = getchar()) != '\n' && ch != EOF);
+
+        switch (update_option)
+        {
+        case 1:
+            update_student_name(st_in.Stu_registration_number);
+            break;
+        case 2:
+            update_father_name(st_in.Stu_registration_number);
+            break;
+        case 3:
+            update_mother_name(st_in.Stu_registration_number);
+            break;
+        case 4:
+            update_father_occupation(st_in.Stu_registration_number);
+            break;
+        case 5:
+            update_mother_occupation(st_in.Stu_registration_number);
+            break;
+        case 6:
+            update_dob(st_in.Stu_registration_number);
+            break;
+        case 7:
+            update_gender(st_in.Stu_registration_number);
+            break;
+        case 8:
+            update_caste(st_in.Stu_registration_number);
+            break;
+        case 9:
+            update_student_email(st_in.Stu_registration_number);
+            break;
+        case 10:
+            update_student_mobile_number(st_in.Stu_registration_number);
+            break;
+        case 11:
+            update_father_mobile_number(st_in.Stu_registration_number);
+            break;
+        case 12:
+            update_address(st_in.Stu_registration_number);
+            break;
+        case 13:
+            printf("Exiting...\n");
+            return;
+        default:
+            printf("Enter Valid Option\n");
+            break;
+        }
+
+        // Update More Information
+
+        if (!confirm_yes_no("Want to Update More Information? (YES/NO): "))
+        {
+            break;; // Exit Function
+        }
     }
-    
 }
 
 // Student Feature Select
