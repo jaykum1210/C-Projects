@@ -50,7 +50,7 @@ struct student_info
 
 // Add Student Acaedmic Data
 
-struct add_student_academic_data
+struct student_academic_information
 {
     int stu_registration_number; // Student Registration Number
 
@@ -115,7 +115,8 @@ int readInt(int *var)
     if (scanf("%d", var) != 1)
     {
         printf("Invalid input! Please enter a number.\n");
-        while (getchar() != '\n');
+        while (getchar() != '\n')
+            ;
         return 0;
     }
     return 1;
@@ -398,7 +399,8 @@ void add_student_personal_info()
     int ch;
 
     // clear buffer safely
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
 
     fp = fopen("Student_academic.dat", "ab");
     if (fp == NULL)
@@ -452,37 +454,38 @@ void add_student_personal_info()
 
 // Check Registration Number exist or not
 
-int check_registration_number_exist(int reg_number){
+int check_registration_number_exist(int reg_number)
+{
     FILE *fp;
     struct student_info stu_info;
     fp = fopen("Student_information.dat", "rb");
     if (fp == NULL)
-        return 0;   // no student file invalid
+        return 0; // no student file invalid
 
     while (fread(&stu_info, sizeof(stu_info), 1, fp))
     {
         if (stu_info.Stu_registration_number == reg_number)
         {
             fclose(fp);
-            return 1;   // found
+            return 1; // found
         }
     }
 
     fclose(fp);
-    return 0;   // not found
+    return 0; // not found
 }
-
 
 // Assign the Section
 
 int is_split_needed(int stu_class)
 {
     FILE *fp;
-    struct add_student_academic_data st;
+    struct student_academic_information st;
     int countA = 0;
 
     fp = fopen("Student_academic.dat", "rb");
-    if (!fp) return 0;
+    if (!fp)
+        return 0;
 
     while (fread(&st, sizeof(st), 1, fp))
     {
@@ -507,12 +510,14 @@ void readclass(const char *msg, int *stu_class)
         if (scanf("%d", stu_class) != 1)
         {
             printf("Invalid input! Please enter a number.\n");
-            while ((ch = getchar()) != '\n' && ch != EOF);
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
             continue;
         }
 
         // clear buffer
-        while ((ch = getchar()) != '\n' && ch != EOF);
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
 
         if (*stu_class < 1 || *stu_class > 12)
         {
@@ -520,7 +525,7 @@ void readclass(const char *msg, int *stu_class)
             continue;
         }
 
-        return;   // valid input
+        return; // valid input
     }
 }
 
@@ -529,7 +534,7 @@ void readclass(const char *msg, int *stu_class)
 char auto_generate_section(int stu_class)
 {
     FILE *fp;
-    struct add_student_academic_data st;
+    struct student_academic_information st;
     int section_count[26] = {0};
     char max_section = 'A';
 
@@ -568,7 +573,7 @@ char auto_generate_section(int stu_class)
 void split_section(int stu_class, char section)
 {
     FILE *fp, *temp;
-    struct add_student_academic_data st;
+    struct student_academic_information st;
     int count = 0;
 
     fp = fopen("Student_academic.dat", "rb");
@@ -589,7 +594,7 @@ void split_section(int stu_class, char section)
             // Move last 10 students to next section
             if (count > 30)
             {
-                st.stu_section = section + 1;   // A → B
+                st.stu_section = section + 1; // A → B
             }
         }
 
@@ -656,16 +661,17 @@ void readsession(const char *msg, char *str, int size)
 
 // Check the School Details If Same as C PROJECT SCHOOL
 
-void readschooldetail(struct add_student_academic_data *add_stu_aca_det){
-    readrequiredstring("Enter School Street : ",add_stu_aca_det->stu_last_address_street,sizeof(add_stu_aca_det->stu_last_address_street));
-    readrequiredstring("Enter School Area : ",add_stu_aca_det->stu_last_address_area,sizeof(add_stu_aca_det->stu_last_address_area));
-    readrequiredstring("Enter School City : ",add_stu_aca_det->stu_last_address_city,sizeof(add_stu_aca_det->stu_last_address_city));
-    readrequiredstring("Enter School State : ",add_stu_aca_det->stu_last_address_state,sizeof(add_stu_aca_det->stu_last_address_state));
+void readschooldetail(struct student_academic_information *add_stu_aca_det)
+{
+    readrequiredstring("Enter School Street : ", add_stu_aca_det->stu_last_address_street, sizeof(add_stu_aca_det->stu_last_address_street));
+    readrequiredstring("Enter School Area : ", add_stu_aca_det->stu_last_address_area, sizeof(add_stu_aca_det->stu_last_address_area));
+    readrequiredstring("Enter School City : ", add_stu_aca_det->stu_last_address_city, sizeof(add_stu_aca_det->stu_last_address_city));
+    readrequiredstring("Enter School State : ", add_stu_aca_det->stu_last_address_state, sizeof(add_stu_aca_det->stu_last_address_state));
 }
 
 // Check School Name
 
-void readschool(const char *msg, char *str, int size,struct add_student_academic_data *stu_last_detail)
+void readschool(const char *msg, char *str, int size, struct student_academic_information *stu_last_detail)
 {
     const char *CURRENT_SCHOOL = "C PROJECT SCHOOL";
     do
@@ -696,11 +702,12 @@ void readschool(const char *msg, char *str, int size,struct add_student_academic
     {
         readschooldetail(stu_last_detail);
     }
-    else{
+    else
+    {
         strcpy(stu_last_detail->stu_last_address_street, "C Street");
-        strcpy(stu_last_detail->stu_last_address_area,"C Area");
-        strcpy(stu_last_detail->stu_last_address_city,"C City");
-        strcpy(stu_last_detail->stu_last_address_state,"C State");
+        strcpy(stu_last_detail->stu_last_address_area, "C Area");
+        strcpy(stu_last_detail->stu_last_address_city, "C City");
+        strcpy(stu_last_detail->stu_last_address_state, "C State");
     }
 }
 
@@ -709,11 +716,12 @@ void readschool(const char *msg, char *str, int size,struct add_student_academic
 void add_student_academic_info()
 {
     FILE *fp;
-    struct add_student_academic_data st_academic;
-    int ch,valid_reg = 0;
+    struct student_academic_information st_academic;
+    int ch, valid_reg = 0;
 
     // clear buffer safely
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
 
     fp = fopen("Student_academic.dat", "ab");
     if (fp == NULL)
@@ -722,19 +730,21 @@ void add_student_academic_info()
         return;
     }
 
- while (!valid_reg)
+    while (!valid_reg)
     {
         printf("Enter Registration Number : ");
 
         if (scanf("%d", &st_academic.stu_registration_number) != 1)
         {
             printf("Invalid input! Enter numbers only.\n");
-            while ((ch = getchar()) != '\n' && ch != EOF);
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
             continue;
         }
 
         // clear buffer
-        while ((ch = getchar()) != '\n' && ch != EOF);
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
 
         if (!check_registration_number_exist(st_academic.stu_registration_number))
         {
@@ -742,7 +752,7 @@ void add_student_academic_info()
             continue;
         }
 
-        valid_reg = 1;   // exit loop
+        valid_reg = 1; // exit loop
     }
 
     readclass("Enter Class : ", &st_academic.stu_class);
@@ -772,7 +782,8 @@ void add_student_academic_info()
     scanf("%f", &st_academic.stu_last_percentage);
 
     // clear buffer safely
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
 
     // Last School Name
     readschool("Enter Last School Name : ", st_academic.stu_last_school, sizeof(st_academic.stu_last_school), &st_academic);
@@ -787,32 +798,280 @@ void add_student_academic_info()
     fclose(fp);
 }
 
-void see_student_academic_details(){
-    FILE *fp1,*fp2;
-    int valid_reg = 0,ch;
-    struct student_info st_in;
-    struct add_student_academic_data stu_aca_data;
+// ========================== See Student Academic Deatils Function Items==========================
+
+// Check Yes No Option
+
+int confirm_yes_no(const char *msg)
+{
+    char choice[10];
+    int ch;
+
     while (1)
     {
-        printf("Enter Registration Number : ");
+        printf("%s", msg);
+        scanf("%9s", choice);
 
-        if (scanf("%d", &stu_aca_data.stu_registration_number) != 1)
-        {
-            printf("Invalid input! Enter numbers only.\n");
-            while ((ch = getchar()) != '\n' && ch != EOF);
-            continue;
-        }
-
-        // clear buffer
+        // clear input buffer
         while ((ch = getchar()) != '\n' && ch != EOF);
 
-        if (!check_registration_number_exist(stu_aca_data.stu_registration_number))
+        // convert to uppercase
+        for (int i = 0; choice[i]; i++)
+            choice[i] = toupper((unsigned char)choice[i]);
+
+        if (strcmp(choice, "YES") == 0)
+            return 1;
+
+        if (strcmp(choice, "NO") == 0)
+            return 0;
+
+        printf("Invalid input! Enter YES or NO.\n");
+    }
+}
+
+
+// Search Student Information by Registration Number
+
+student_information_by_registration(int reg_no, struct student_info *st_info)
+{
+    FILE *fp = fopen("Student_information.dat", "rb");
+    if (fp == NULL)
+        return 0;
+
+    while (fread(st_info, sizeof(*st_info), 1, fp))
+    {
+        if (st_info->Stu_registration_number == reg_no)
         {
-            printf("Registration number not found! Please enter a valid one.\n");
+            fclose(fp);
+            return 1; // FOUND
+        }
+    }
+
+    fclose(fp);
+    return 0; // NOT FOUND
+}
+
+// Search Student Academic Information by Registration Number
+
+student_academic_by_registration(int reg_no, struct student_academic_information *stu_aca_info)
+{
+    FILE *fp = fopen("Student_academic.dat", "rb");
+    if (fp == NULL)
+        return 0;
+
+    while (fread(stu_aca_info, sizeof(*stu_aca_info), 1, fp))
+    {
+        if (stu_aca_info->stu_registration_number == reg_no)
+        {
+            fclose(fp);
+            return 1; // FOUND
+        }
+    }
+    fclose(fp);
+    return 0; // NOT FOUND
+}
+
+// See Student Academic Details
+
+void see_student_academic_details()
+{
+    int ch, registration_number;
+    struct student_info st_in;
+    struct student_academic_information stu_aca_data;
+    char choice[10];
+
+    while (1) // MAIN LOOP
+    {
+        printf("\nEnter Registration Number : ");
+
+        if (scanf("%d", &registration_number) != 1)
+        {
+            printf("Invalid input! Enter numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
             continue;
         }
+
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
+        /* -------- STUDENT NOT FOUND -------- */
+        if (!check_registration_number_exist(registration_number))
+        {
+            printf("Student not found!\n");
+
+            while (1)
+            {
+                printf("Want to add this student? (YES/NO): ");
+                scanf("%9s", choice);
+
+                while ((ch = getchar()) != '\n' && ch != EOF)
+                    ;
+
+                for (int i = 0; choice[i]; i++)
+                    choice[i] = toupper((unsigned char)choice[i]);
+
+                if (strcmp(choice, "YES") == 0)
+                {
+                    add_student_personal_info();
+                    add_student_academic_info();
+                    break;
+                }
+                else if (strcmp(choice, "NO") == 0)
+                {
+                    break;
+                }
+                else
+                {
+                    printf("Invalid input! Enter YES or NO.\n");
+                }
+            }
+            continue; // Ask Registration Number Again
+        }
+
+        /* -------- STUDENT FOUND -------- */
+        if (!student_information_by_registration(registration_number, &st_in) ||
+            !student_academic_by_registration(registration_number, &stu_aca_data))
+        {
+            printf("Academic details not found!\n");
+            continue;
+        }
+
+        printf("\n----------------------------------------------\n");
+        printf("            STUDENT ACADEMIC DETAILS\n            ");
+        printf("\n----------------------------------------------\n");
+
+        // Print Name Of the Student And Also Checks For The Middle Name
+        if (strlen(st_in.stu_middlename) > 0)
+        {
+            printf("Name : %s %s %s\n",
+                   st_in.stu_firstname,
+                   st_in.stu_middlename,
+                   st_in.stu_lastname);
+        }
+        else
+        {
+            printf("Name : %s %s\n",
+                   st_in.stu_firstname,
+                   st_in.stu_lastname);
+        }
+
+        printf("Registration No : %d\n", registration_number);
+        printf("School Email    : %s\n", st_in.Stu_School_email);
+        printf("Class           : %d\n", stu_aca_data.stu_class);
+        printf("Section         : %c\n", stu_aca_data.stu_section);
+        printf("Academic Year   : %s\n", stu_aca_data.stu_academic_year);
+
+        while (1)
+        {
+            printf("Search another student? (YES/NO): ");
+            scanf("%9s", choice);
+
+            while ((ch = getchar()) != '\n' && ch != EOF);
+
+            // Convert to uppercase
+            for (int i = 0; choice[i]; i++)
+                choice[i] = toupper((unsigned char)choice[i]);
+
+            if (strcmp(choice, "YES") == 0)
+            {
+                break; // go back to main loop (ask reg number again)
+            }
+            else if (strcmp(choice, "NO") == 0)
+            {
+                return; // exit function completely
+            }
+            else
+            {
+                printf("Invalid input! Please enter YES or NO.\n");  // loop continues automatically
+            }
+        }
+    }
+}
+
+// ========================== See Student Academic Deatils Function Items==========================
+
+void update_student_information(struct student_info *stu_info){
+    printf("1. Student Name\n");
+    printf("2. Father Name\n");
+    printf("3. Mother Name\n");
+    printf("4. Father Occupation\n");
+    printf("5. Mother Occupation\n");
+    printf("6. Date Of Birth(DOB)\n");
+    printf("7. Gender\n");
+    printf("8. Caste\n");
+    printf("9. Student Email Id\n");
+    printf("10. Student Mobile Number\n");
+    printf("11. Father Mobile Number\n");
+    printf("12. Address\n");
+    printf("13. Exit\n");
+}
+
+// Update Student Information
+
+void update_student_info(){
+    int ch, registration_number,update_option = 0;
+    struct student_info st_in;
+    char ask_update[3];
+    while (1)
+    {
+        printf("Choose Which Item You Want to Update\n");
+        update_student_information(&st_in);
+        while (1)
+        {
+            printf("Enter option : ");
+            scanf("%d",&update_option);
+            switch (update_option)
+            {
+            case 1:
+                update_student_name();
+                break;
+            case 2:
+                update_father_name();
+                break;
+            case 3:
+                update_mother_name();
+                break;
+            case 4:
+                update_father_occupation();
+                break;
+            case 5:
+                update_mother_occupation();
+                break;
+            case 6:
+                update_dob();
+                break;
+            case 7:
+                update_gender();
+                break;
+            case 8:
+                update_caste();
+                break;
+            case 9:
+                update_student_email();
+                break;
+            case 10:
+                update_student_mobile_number();
+                break;
+            case 11:
+                update_father_mobile_number();
+                break;
+            case 12:
+                update_address();
+                break;
+            case 13:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Enter Valid Option\n");
+                break;
+            }
+
+            printf("Want to Update More Details (Yes/No) : ");
+            scanf("%s",&ask_update);
+
+        }
         
-        valid_reg = 1;   // exit loop
     }
     
 }
