@@ -676,6 +676,51 @@ void split_section(int stu_class, char section)
     rename("temp_academic.dat", "Student_academic.dat");
 }
 
+// Check Section
+
+void readsection(const char *msg, int stu_class, char *stu_section)
+{
+    int ch;
+
+    while (1)
+    {
+        printf("%s", msg);
+
+        if (scanf(" %c", stu_section) != 1)
+        {
+            printf("Invalid input! Enter a section letter.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        // clear buffer
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
+        // normalize to uppercase
+        if (*stu_section >= 'a' && *stu_section <= 'z')
+            *stu_section -= 32;
+
+        // basic validation
+        if (*stu_section < 'A' || *stu_section > 'Z')
+        {
+            printf("Invalid section! Enter A–Z only.\n");
+            continue;
+        }
+
+        // check section exists for the class
+        if (!is_section_valid_for_class(stu_class, *stu_section))
+        {
+            printf("Section %c does not exist for Class %d.\n",
+                   *stu_section, stu_class);
+            continue;
+        }
+
+        return; // valid section
+    }
+}
+
 // Read Year Session in format - 'YYYY-YYYY'
 
 void readsession(const char *msg, char *str, int size)
@@ -775,6 +820,47 @@ void readschool(const char *msg, char *str, int size, struct student_academic_in
         strcpy(stu_last_detail->stu_last_address_area, "C Area");
         strcpy(stu_last_detail->stu_last_address_city, "C City");
         strcpy(stu_last_detail->stu_last_address_state, "C State");
+    }
+}
+
+// Check the Stream for 11 and 12
+
+void readstream(const char *msg, char *stream, int size)
+{
+    int ch;
+
+    while (1)
+    {
+        printf("%s", msg);
+
+        if (fgets(stream, size, stdin) == NULL)
+        {
+            printf("Invalid input. Try again.\n");
+            continue;
+        }
+
+        // remove newline
+        stream[strcspn(stream, "\n")] = '\0';
+
+        // convert to uppercase
+        for (int i = 0; stream[i]; i++)
+            stream[i] = toupper((unsigned char)stream[i]);
+
+        // validate stream
+        if (strcmp(stream, "PCM") == 0 ||
+            strcmp(stream, "PCB") == 0 ||
+            strcmp(stream, "PCMB") == 0 ||
+            strcmp(stream, "COMMERCE") == 0 ||
+            strcmp(stream, "ARTS") == 0)
+        {
+            return; // valid stream
+        }
+
+        printf("Invalid stream! Allowed values: PCM, PCB, PCMB, COMMERCE, ARTS\n");
+
+        // clear buffer if needed
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
     }
 }
 
@@ -1045,7 +1131,7 @@ void see_student_academic_details()
     }
 }
 
-// ========================== See Student Academic Deatils Function Items==========================
+// ========================== Update Student Personal Detail Function Items==========================
 
 void update_student_information()
 {
@@ -1496,7 +1582,6 @@ void update_student_info()
 {
     int ch, update_option = 0, valid_reg = 0;
     struct student_info st_in;
-    char ask_update[3];
 
     // Clear Buffer
     while ((ch = getchar()) != '\n' && ch != EOF)
@@ -1536,12 +1621,14 @@ void update_student_info()
         if (scanf("%d", &update_option) != 1)
         {
             printf("Invalid input! Numbers only.\n");
-            while ((ch = getchar()) != '\n' && ch != EOF);
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
             continue;
         }
 
         // Clear Buffer
-        while ((ch = getchar()) != '\n' && ch != EOF);
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
 
         switch (update_option)
         {
@@ -1593,14 +1680,125 @@ void update_student_info()
 
         if (!confirm_yes_no("Want to Update More Information? (YES/NO): "))
         {
-            break;; // Exit Function
+            break;
+            ; // Exit Function
         }
     }
 }
 
-// ========================== See Student Academic Deatils Function Items==========================
+// ========================== View All Student Function items ==========================
 
-// 
+// Check Stream
+
+int is_stream_match(int stu_class, char *record_stream, char *input_stream)
+{
+    if (stu_class < 11)
+        return 1; // stream not applicable
+
+    return strcmp(record_stream, input_stream) == 0;
+}
+
+// Print Student By Registration Number (Name and Registration Number)
+
+void print_student_by_registration(int reg_no)
+{
+    FILE *fp;
+    struct student_info stu_info;
+
+    fp = fopen("Student_information.dat", "rb");
+    if (fp == NULL)
+    {
+        printf("File Not open\n");
+        return;
+    }
+
+    while (fread(&stu_info, sizeof(stu_info), 1, fp))
+    {
+        if (stu_info.Stu_registration_number == reg_no)
+        {
+            printf("%-15d %-15s %-15s %-15s\n", stu_info.Stu_registration_number, stu_info.stu_firstname, stu_info.stu_middlename, stu_info.stu_lastname);
+            fclose(fp);
+            return;
+        }
+    }
+
+    fclose(fp);
+}
+
+// View Students of Particular Class ans Section
+
+void view_student_by_class_section(int stu_class, char stu_section, char *stream)
+{
+    FILE *fp;
+    struct student_academic_information stu_aca_info;
+    int found = 0;
+
+    fp = fopen("Student_academic.dat", "rb");
+    if (fp == NULL)
+    {
+        printf("File Not Found\n");
+        return;
+    }
+
+    printf("\nStudents of Class %d Section %c", stu_class, stu_section);
+    if (stu_class >= 11)
+        printf(" Stream %s", stream);
+    printf("\n");
+
+    printf("--------------------------------------------------\n");
+    printf("%-15s %-15s %-15s %-15s\n",
+           "Registration No.", "First Name", "Middle Name", "Last Name");
+    printf("--------------------------------------------------\n");
+
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp))
+    {
+        if (stu_aca_info.stu_class == stu_class &&
+            stu_aca_info.stu_section == stu_section &&
+            is_stream_match(stu_class, stu_aca_info.stream, stream))
+        {
+            print_student_by_registration(stu_aca_info.stu_registration_number);
+            found = 1;
+        }
+    }
+
+    fclose(fp);
+
+    if (!found)
+    {
+        printf("No Student Found\n");
+    }
+}
+
+// View All Student Main Function
+
+void view_all_students()
+{
+    int ch;
+    int stu_class;
+    char stu_section;
+    char stream[10] = "";
+
+    // Clear buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    // Read class
+    readclass("Enter class : ", &stu_class);
+
+    // Read section
+    readsection("Enter Section : ", stu_class, &stu_section);
+
+    // Read stream ONLY for class 11 & 12
+    if (stu_class >= 11)
+    {
+        readstream("Enter Stream (PCM/PCB/PCMB/COMMERCE/ARTS) : ",stream, sizeof(stream));
+    }
+
+    // View students
+    view_student_by_class_section(stu_class, stu_section, stream);
+}
+
+// ========================== Student All Features List ==========================
 
 // Student Feature Select
 
@@ -1616,6 +1814,7 @@ void student_features(int feature_choice)
         break;
     case 3:
         see_student_academic_details();
+        break;
     case 4:
         update_student_info(); // Update Student Information
         break;
@@ -1687,7 +1886,7 @@ int main()
             }
             while (student_dashboard != 12)
             {
-                student_Features(student_dashboard);
+                student_features(student_dashboard);
             }
 
             break;
