@@ -99,7 +99,7 @@ void student_dashboard()
     printf("3. See Student Academic Details.\n");
     printf("4. Update Student Information\n");
     printf("5. View All Students\n");
-    printf("6. View Courses & Teachers Assigned\n");
+    printf("6. View Courses Assigned\n");
     printf("7. Search Student\n");
     printf("8. Sort Student Records\n");
     printf("9. View Student Result\n");
@@ -122,7 +122,7 @@ int readInt(int *var)
     return 1;
 }
 
-// ========================== add_student_personal_info Function Items==========================
+// ========================== Add Student Personal Info Function Items==========================
 
 // Gennerate Registration Number
 
@@ -518,6 +518,89 @@ void add_student_personal_info()
 }
 
 // ========================== add_student_academic_info Function Items ==========================
+
+// Course Enrolled
+
+void assign_subjects(struct student_academic_information *stu_aca_info)
+{
+    stu_aca_info->stu_subject_count;
+
+    if (stu_aca_info->stu_class <= 5 && stu_aca_info->stu_class >= 1)
+    {
+        strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
+        strcpy(stu_aca_info->stu_subjects[1], "HINDI");
+        strcpy(stu_aca_info->stu_subjects[2], "MATHEMATICS");
+        strcpy(stu_aca_info->stu_subjects[3], "ENVIRONMENTAL STUDIES");
+        strcpy(stu_aca_info->stu_subjects[4], "GENERAL KNOWLEDGE");
+        strcpy(stu_aca_info->stu_subjects[5], "COMPUTER");
+        stu_aca_info->stu_subject_count = 6;
+    }
+    else if (stu_aca_info->stu_class <= 8)
+    {
+        strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
+        strcpy(stu_aca_info->stu_subjects[1], "HINDI");
+        strcpy(stu_aca_info->stu_subjects[2], "SANSKRIT");
+        strcpy(stu_aca_info->stu_subjects[3], "MATHEMATICS");
+        strcpy(stu_aca_info->stu_subjects[4], "SCIENCE");
+        strcpy(stu_aca_info->stu_subjects[5], "SOCIAL STUDIES");
+        strcpy(stu_aca_info->stu_subjects[6], "COMPUTER");
+        stu_aca_info->stu_subject_count = 7;
+    }
+    else if (stu_aca_info->stu_class <= 10)
+    {
+        strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
+        strcpy(stu_aca_info->stu_subjects[1], "MATHEMATICS");
+        strcpy(stu_aca_info->stu_subjects[2], "SCIENCE");
+        strcpy(stu_aca_info->stu_subjects[3], "SOCIAL STUDIES");
+        strcpy(stu_aca_info->stu_subjects[4], "COMPUTER");
+        stu_aca_info->stu_subject_count = 5;
+    }
+    else
+    {
+        if (strcmp(stu_aca_info->stream, "PCM"))
+        {
+            strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
+            strcpy(stu_aca_info->stu_subjects[1], "PHYSICS");
+            strcpy(stu_aca_info->stu_subjects[2], "CHEMISTRY");
+            strcpy(stu_aca_info->stu_subjects[3], "MATHEMATICS");
+            strcpy(stu_aca_info->stu_subjects[4], "COMPUTER");
+            strcpy(stu_aca_info->stu_subjects[5], "YOGA");
+            stu_aca_info->stu_subject_count = 6;
+        }
+        else if (strcmp(stu_aca_info->stream, "PCB"))
+        {
+            strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
+            strcpy(stu_aca_info->stu_subjects[1], "PHYSICS");
+            strcpy(stu_aca_info->stu_subjects[2], "CHEMISTRY");
+            strcpy(stu_aca_info->stu_subjects[3], "BIOLOGY");
+            strcpy(stu_aca_info->stu_subjects[4], "COMPUTER");
+            strcpy(stu_aca_info->stu_subjects[5], "YOGA");
+            stu_aca_info->stu_subject_count = 6;
+        }
+        else if (strcmp(stu_aca_info->stream, "PCMB"))
+        {
+            strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
+            strcpy(stu_aca_info->stu_subjects[1], "PHYSICS");
+            strcpy(stu_aca_info->stu_subjects[2], "CHEMISTRY");
+            strcpy(stu_aca_info->stu_subjects[3], "MATHEMATICS");
+            strcpy(stu_aca_info->stu_subjects[4], "BIOLOGY");
+            strcpy(stu_aca_info->stu_subjects[5], "COMPUTER");
+            strcpy(stu_aca_info->stu_subjects[6], "YOGA");
+            stu_aca_info->stu_subject_count = 7;
+        }
+        else if (strcmp(stu_aca_info->stream, "COMMERCE"))
+        {
+            strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
+            strcpy(stu_aca_info->stu_subjects[1], "ACCOUNTANCY");
+            strcpy(stu_aca_info->stu_subjects[2], "BUSINESS STUDIES");
+            strcpy(stu_aca_info->stu_subjects[3], "ECONOMICS");
+            strcpy(stu_aca_info->stu_subjects[4], "COMPUTER");
+            strcpy(stu_aca_info->stu_subjects[5], "APPLIED MATHS");
+            strcpy(stu_aca_info->stu_subjects[6], "YOGA");
+            stu_aca_info->stu_subject_count = 7;
+        }
+    }
+}
 
 // Check Registration Number exist or not
 
@@ -1130,6 +1213,8 @@ void see_student_academic_details()
         }
     }
 }
+
+//
 
 // ========================== Update Student Personal Detail Function Items==========================
 
@@ -1791,11 +1876,99 @@ void view_all_students()
     // Read stream ONLY for class 11 & 12
     if (stu_class >= 11)
     {
-        readstream("Enter Stream (PCM/PCB/PCMB/COMMERCE/ARTS) : ",stream, sizeof(stream));
+        readstream("Enter Stream (PCM/PCB/PCMB/COMMERCE/ARTS) : ", stream, sizeof(stream));
     }
 
     // View students
     view_student_by_class_section(stu_class, stu_section, stream);
+}
+
+// ========================== View Enrolled Courses Function Items==========================
+
+// Print Subject by Class, Section and Stream
+
+void print_subjects(int stu_class,char stu_section, char stu_stream){
+    FILE *fp;
+    struct student_academic_information stu_aca_info;
+    int ch;
+
+    // Clear buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+    
+    
+}
+
+// Get Subjects Of Student
+
+void get_subject_by_registration(int stu_reg)
+{
+    FILE *fp;
+    struct student_academic_information stu_aca_info;
+    int ch, stu_class = 0;
+    char stu_section, stu_stream[] = "";
+    
+    // Clear buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp))
+    {
+        if (stu_aca_info.stu_registration_number == stu_reg)
+        {
+            stu_class = stu_aca_info.stu_class;
+            strcpy(stu_section, stu_aca_info.stu_section);
+            if (stu_class > 10)
+            {
+                strcpy(stu_section, stu_aca_info.stream);
+                fclose(fp);
+                break;
+            }
+        }
+    }
+    print_subjects(stu_class,stu_section,stu_stream);
+}
+
+// View Enrolled Courses
+
+void view_all_students()
+{
+    int ch, valid_reg = 0, stu_reg_number, stu_class;
+    char section;
+    char stu_stream[10];
+    struct student_academic_information st_academic;
+
+    // Clear buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (!valid_reg)
+    {
+        printf("Enter Registration Number : ");
+
+        if (scanf("%d", &st_academic.stu_registration_number) != 1)
+        {
+            printf("Invalid input! Enter numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        // clear buffer
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
+        if (!check_registration_number_exist(st_academic.stu_registration_number))
+        {
+            printf("Registration number not found! Please enter a valid one.\n");
+            continue;
+        }
+        valid_reg = 1; // exit loop
+    }
+
+    // readclass("Enter Class : ",&stu_class);
+    // readsection("Enter Section : ",&stu_class,*stu_stream);
+    get_subject_by_registration(st_academic.stu_registration_number);
 }
 
 // ========================== Student All Features List ==========================
@@ -1822,7 +1995,7 @@ void student_features(int feature_choice)
         view_all_students(); // View All Students
         break;
     case 6:
-        view_course_teacher(); // View Course and Teacher Enrolled of a Student
+        view_course_teacher(); // View Course Enrolled of a Student
         break;
     case 7:
         search_student(); // Search Student according to - id, Registration number, gmail, name etc.
