@@ -557,7 +557,7 @@ void assign_subjects(struct student_academic_information *stu_aca_info)
     }
     else
     {
-        if (strcmp(stu_aca_info->stream, "PCM"))
+        if (strcmp(stu_aca_info->stream, "PCM")==0)
         {
             strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
             strcpy(stu_aca_info->stu_subjects[1], "PHYSICS");
@@ -567,7 +567,7 @@ void assign_subjects(struct student_academic_information *stu_aca_info)
             strcpy(stu_aca_info->stu_subjects[5], "YOGA");
             stu_aca_info->stu_subject_count = 6;
         }
-        else if (strcmp(stu_aca_info->stream, "PCB"))
+        else if (strcmp(stu_aca_info->stream, "PCB")==0)
         {
             strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
             strcpy(stu_aca_info->stu_subjects[1], "PHYSICS");
@@ -577,7 +577,7 @@ void assign_subjects(struct student_academic_information *stu_aca_info)
             strcpy(stu_aca_info->stu_subjects[5], "YOGA");
             stu_aca_info->stu_subject_count = 6;
         }
-        else if (strcmp(stu_aca_info->stream, "PCMB"))
+        else if (strcmp(stu_aca_info->stream, "PCMB")==0)
         {
             strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
             strcpy(stu_aca_info->stu_subjects[1], "PHYSICS");
@@ -588,7 +588,7 @@ void assign_subjects(struct student_academic_information *stu_aca_info)
             strcpy(stu_aca_info->stu_subjects[6], "YOGA");
             stu_aca_info->stu_subject_count = 7;
         }
-        else if (strcmp(stu_aca_info->stream, "COMMERCE"))
+        else if (strcmp(stu_aca_info->stream, "COMMERCE")==0)
         {
             strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
             strcpy(stu_aca_info->stu_subjects[1], "ACCOUNTANCY");
@@ -599,6 +599,18 @@ void assign_subjects(struct student_academic_information *stu_aca_info)
             strcpy(stu_aca_info->stu_subjects[6], "YOGA");
             stu_aca_info->stu_subject_count = 7;
         }
+        else if (strcmp(stu_aca_info->stream,"ARTS")==0)
+        {
+            strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
+            strcpy(stu_aca_info->stu_subjects[1], "HISTORY");
+            strcpy(stu_aca_info->stu_subjects[2], "GEOGRAPHY");
+            strcpy(stu_aca_info->stu_subjects[3], "POLITICAL SCIENCE");
+            strcpy(stu_aca_info->stu_subjects[4], "ECONOMICS");
+            strcpy(stu_aca_info->stu_subjects[5], "SOCIOLOGY");
+            strcpy(stu_aca_info->stu_subjects[6], "PSYCHOLOGY");
+            stu_aca_info->stu_subject_count = 7;
+        }
+        
     }
 }
 
@@ -1887,17 +1899,50 @@ void view_all_students()
 
 // Print Subject by Class, Section and Stream
 
-void print_subjects(int stu_class,char stu_section, char stu_stream){
-    FILE *fp;
-    struct student_academic_information stu_aca_info;
+void print_subjects(int stu_class, char stu_section, char stu_stream[])
+{
     int ch;
+    struct student_academic_information stu_aca_info;
 
-    // Clear buffer
+    // clear buffer safely
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
-    
-    
+
+    // Prepare academic info
+    stu_aca_info.stu_class = stu_class;
+    stu_aca_info.stu_section = stu_section;
+
+    if (stu_class > 10)
+        strcpy(stu_aca_info.stream, stu_stream);
+    else
+        stu_aca_info.stream[0] = '\0';
+
+    // Assign subjects based on class & stream
+    assign_subjects(&stu_aca_info);
+
+    // Print subjects
+    printf("\nEnrolled Subjects\n");
+    printf("---------------------------\n");
+    printf("Class   : %d\n", stu_class);
+    printf("Section : %c\n", stu_section);
+
+    if (stu_class > 10)
+        printf("Stream  : %s\n", stu_stream);
+
+    printf("---------------------------\n");
+
+    if (stu_aca_info.stu_subject_count == 0)
+    {
+        printf("No subjects assigned.\n");
+        return;
+    }
+
+    for (int i = 0; i < stu_aca_info.stu_subject_count; i++)
+    {
+        printf("%d. %s\n", i + 1, stu_aca_info.stu_subjects[i]);
+    }
 }
+
 
 // Get Subjects Of Student
 
@@ -1906,8 +1951,15 @@ void get_subject_by_registration(int stu_reg)
     FILE *fp;
     struct student_academic_information stu_aca_info;
     int ch, stu_class = 0;
-    char stu_section, stu_stream[] = "";
-    
+    char stu_section = '\0', stu_stream[] = "";
+
+    fp = fopen("Student_academic.dat", "rb");
+    if (fp == NULL)
+    {
+        printf("Error: Unable to open academic file.\n");
+        return;
+    }
+
     // Clear buffer
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
@@ -1917,25 +1969,25 @@ void get_subject_by_registration(int stu_reg)
         if (stu_aca_info.stu_registration_number == stu_reg)
         {
             stu_class = stu_aca_info.stu_class;
-            strcpy(stu_section, stu_aca_info.stu_section);
+            stu_section = stu_aca_info.stu_section;
             if (stu_class > 10)
             {
                 strcpy(stu_section, stu_aca_info.stream);
-                fclose(fp);
-                break;
             }
+            fclose(fp);
+            print_subjects(stu_class,stu_section,stu_stream);
+            break;
         }
     }
-    print_subjects(stu_class,stu_section,stu_stream);
+    fclose(fp);
+    printf("Academic record not found for this student.\n");
 }
 
 // View Enrolled Courses
 
-void view_all_students()
+void view_courses()
 {
-    int ch, valid_reg = 0, stu_reg_number, stu_class;
-    char section;
-    char stu_stream[10];
+    int ch, valid_reg = 0;
     struct student_academic_information st_academic;
 
     // Clear buffer
@@ -1965,11 +2017,13 @@ void view_all_students()
         }
         valid_reg = 1; // exit loop
     }
-
-    // readclass("Enter Class : ",&stu_class);
-    // readsection("Enter Section : ",&stu_class,*stu_stream);
+    
     get_subject_by_registration(st_academic.stu_registration_number);
 }
+
+// ========================== Search Student By Different Things ==========================
+
+
 
 // ========================== Student All Features List ==========================
 
@@ -1995,7 +2049,7 @@ void student_features(int feature_choice)
         view_all_students(); // View All Students
         break;
     case 6:
-        view_course_teacher(); // View Course Enrolled of a Student
+        view_courses(); // View Course Enrolled of a Student
         break;
     case 7:
         search_student(); // Search Student according to - id, Registration number, gmail, name etc.
