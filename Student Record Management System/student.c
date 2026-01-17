@@ -557,7 +557,7 @@ void assign_subjects(struct student_academic_information *stu_aca_info)
     }
     else
     {
-        if (strcmp(stu_aca_info->stream, "PCM")==0)
+        if (strcmp(stu_aca_info->stream, "PCM") == 0)
         {
             strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
             strcpy(stu_aca_info->stu_subjects[1], "PHYSICS");
@@ -567,7 +567,7 @@ void assign_subjects(struct student_academic_information *stu_aca_info)
             strcpy(stu_aca_info->stu_subjects[5], "YOGA");
             stu_aca_info->stu_subject_count = 6;
         }
-        else if (strcmp(stu_aca_info->stream, "PCB")==0)
+        else if (strcmp(stu_aca_info->stream, "PCB") == 0)
         {
             strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
             strcpy(stu_aca_info->stu_subjects[1], "PHYSICS");
@@ -577,7 +577,7 @@ void assign_subjects(struct student_academic_information *stu_aca_info)
             strcpy(stu_aca_info->stu_subjects[5], "YOGA");
             stu_aca_info->stu_subject_count = 6;
         }
-        else if (strcmp(stu_aca_info->stream, "PCMB")==0)
+        else if (strcmp(stu_aca_info->stream, "PCMB") == 0)
         {
             strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
             strcpy(stu_aca_info->stu_subjects[1], "PHYSICS");
@@ -588,7 +588,7 @@ void assign_subjects(struct student_academic_information *stu_aca_info)
             strcpy(stu_aca_info->stu_subjects[6], "YOGA");
             stu_aca_info->stu_subject_count = 7;
         }
-        else if (strcmp(stu_aca_info->stream, "COMMERCE")==0)
+        else if (strcmp(stu_aca_info->stream, "COMMERCE") == 0)
         {
             strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
             strcpy(stu_aca_info->stu_subjects[1], "ACCOUNTANCY");
@@ -599,7 +599,7 @@ void assign_subjects(struct student_academic_information *stu_aca_info)
             strcpy(stu_aca_info->stu_subjects[6], "YOGA");
             stu_aca_info->stu_subject_count = 7;
         }
-        else if (strcmp(stu_aca_info->stream,"ARTS")==0)
+        else if (strcmp(stu_aca_info->stream, "ARTS") == 0)
         {
             strcpy(stu_aca_info->stu_subjects[0], "ENGLISH");
             strcpy(stu_aca_info->stu_subjects[1], "HISTORY");
@@ -610,7 +610,6 @@ void assign_subjects(struct student_academic_information *stu_aca_info)
             strcpy(stu_aca_info->stu_subjects[6], "PSYCHOLOGY");
             stu_aca_info->stu_subject_count = 7;
         }
-        
     }
 }
 
@@ -1943,7 +1942,6 @@ void print_subjects(int stu_class, char stu_section, char stu_stream[])
     }
 }
 
-
 // Get Subjects Of Student
 
 void get_subject_by_registration(int stu_reg)
@@ -1975,7 +1973,7 @@ void get_subject_by_registration(int stu_reg)
                 strcpy(stu_section, stu_aca_info.stream);
             }
             fclose(fp);
-            print_subjects(stu_class,stu_section,stu_stream);
+            print_subjects(stu_class, stu_section, stu_stream);
             break;
         }
     }
@@ -2017,13 +2015,244 @@ void view_courses()
         }
         valid_reg = 1; // exit loop
     }
-    
+
     get_subject_by_registration(st_academic.stu_registration_number);
 }
 
 // ========================== Search Student By Different Things ==========================
 
+// Print Student All Information
 
+void print_all_information(int reg_number)
+{
+    FILE *fp1, *fp2;
+    struct student_info stu_info;
+    struct student_academic_information stu_aca_info;
+    int found1 = 0, found2 = 0;
+
+    // File Open
+    fp1 = fopen("Student_information.dat", "rb");
+    fp2 = fopen("Student_academic.dat", "rb");
+    if (fp1 == NULL || fp2 == NULL)
+    {
+        printf("File Not Found\n");
+        return;
+    }
+
+    while (fread(&stu_info, sizeof(stu_info), 1, fp1))
+    {
+        if (reg_number == stu_info.Stu_registration_number)
+        {
+            found1 = 1;
+            printf("---------------------------- STUDENT FOUND ----------------------------\n");
+            if (strlen(stu_info.stu_middlename) > 0)
+            {
+                printf("Student Name : %s %s %s\n", stu_info.stu_firstname, stu_info.stu_middlename, stu_info.stu_lastname);
+            }
+            else
+            {
+                printf("Student Name : %s %s\n", stu_info.stu_firstname, stu_info.stu_lastname);
+            }
+            printf("Registration Number : %d\n", stu_info.Stu_registration_number);
+            printf("Father Name : %s\n", stu_info.stu_fathername);
+            printf("Mother Name : %s\n", stu_info.stu_mothername);
+            printf("Father Occupation : %s\n", stu_info.stu_father_occu);
+            printf("Mother Occupation : %s\n", stu_info.stu_mother_occu);
+            printf("DOB : %s\n", stu_info.stu_dob);
+            printf("Gender : %s\n", stu_info.stu_gender);
+            printf("Caste : %s\n", stu_info.stu_caste);
+            printf("Student Email Id : %s\n", stu_info.stu_email);
+            printf("School Email Id : %s\n", stu_info.Stu_School_email);
+            printf("Student Mobile Number : %s\n", stu_info.stu_mobile_number);
+            printf("Father Mobile Number : %s\n", stu_info.stu_father_number);
+            printf("Address : %s, %s, %s, %s, %d\n", stu_info.stu_street, stu_info.stu_area, stu_info.stu_city, stu_info.stu_state, stu_info.stu_zipcode);
+            break;
+        }
+    }
+
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp2))
+    {
+        if (reg_number == stu_aca_info.stu_registration_number)
+        {
+            found2 = 1;
+            printf("Class : %d\n", stu_aca_info.stu_class);
+            printf("Section : %c\n", stu_aca_info.stu_section);
+            if (stu_aca_info.stu_class > 10)
+            {
+                printf("Stream : %s\n", stu_aca_info.stream);
+            }
+            printf("Subjects : ");
+            for (int i = 0; i < stu_aca_info.stu_subject_count; i++)
+            {
+                printf("%s ", stu_aca_info.stu_subjects[i]);
+            }
+            printf("\n");
+            printf("Academic Year : %s\n", stu_aca_info.stu_academic_year);
+            break;
+        }
+    }
+
+    fclose(fp1);
+    fclose(fp2);
+
+    if (!found1)
+    {
+        printf("Student Not Found\n");
+    }
+    else if (!found2)
+    {
+        printf("Student Academic Information Not Found\n");
+    }
+}
+
+// Search Student By Name
+
+void search_student_by_name()
+{
+    FILE *fp;
+    int ch, found = 0;
+    struct student_info stu_info;
+
+    char stu_first_name[100], stu_middle_name[100], stu_last_name[100];
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    fp = fopen("Student_information.dat", "rb");
+    if (fp == NULL)
+    {
+        printf("File Not Found\n");
+        return;
+    }
+
+    readrequiredstring("Enter First Name : ", stu_first_name, sizeof(stu_first_name));
+    readoptionalstring("Enter Middle Name : ", stu_middle_name, sizeof(stu_middle_name));
+    readrequiredstring("Enter Last Name : ", stu_last_name, sizeof(stu_last_name));
+
+    while (fread(&stu_info, sizeof(stu_info), 1, fp))
+    {
+        if (strcmp(stu_first_name, stu_info.stu_firstname) == 0 && (strlen(stu_middle_name) == 0 || strcmp(stu_middle_name, stu_info.stu_middlename) == 0) && strcmp(stu_last_name, stu_info.stu_lastname) == 0)
+        {
+            found = 1;
+            print_all_information(stu_info.Stu_registration_number);
+        }
+    }
+    fclose(fp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+    }
+}
+
+// Serach Student By Registration Number
+
+void search_student_by_registration(){
+    int reg_number;
+
+    printf("Enter Registration Number : ");
+    scanf("%d",&reg_number);
+    if (check_registration_number_exist(reg_number))
+    {
+        print_all_information(reg_number);
+    }
+    else{
+        printf("Student Not Found\n");
+    }
+}
+
+// Search Student By Student Email Id
+
+void search_student_by_student_email(){
+    FILE *fp;
+    struct student_info stu_info;
+    int found = 0,ch;
+    char student_email_id[100];
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+    
+    fp = fopen("Student_information.dat","rb");
+    if (fp==NULL)
+    {
+        printf("File Not Open\n");
+        return;
+    }
+    
+    // Check Email Id 
+    readmail("Enter Student Email Id : ",student_email_id,sizeof(student_email_id));
+
+    while (fread(&stu_info,sizeof(stu_info),1,fp))
+    {
+        if (strcmp(student_email_id,stu_info.stu_email)==0)
+        {
+            found = 1;
+            print_all_information(stu_info.Stu_registration_number);
+            fclose(fp);
+            break;
+        }
+    }
+    if (!found)
+    {
+        printf("Student Not Found\n");
+    }
+}
+
+// Search Student By Information
+
+void serach_by_items_list()
+{
+    printf("1. Student Name\n");
+    printf("2. Registration Number\n");
+    printf("3. Student Email Id\n");
+    printf("4. School Emial Id\n");
+    printf("5. Student Mobile Number\n");
+    printf("6. Exit\n");
+}
+
+void search_student()
+{
+    int ch, search_option = 0;
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    // Search student By Information
+    search_by_items_list();
+
+    // Switch Case
+    while (1)
+    {
+        printf("Enter option : ");
+        scanf("%d", &search_option);
+        switch (search_option)
+        {
+        case 1:
+            search_student_by_name();
+            break;
+        case 2:
+            search_student_by_registration();
+            break;
+        case 3:
+            search_student_by_student_email();
+            break;
+        case 4:
+            search_student_by_school_email();
+            break;
+        case 5:
+            search_student_by_mobile();
+            break;
+        case 6:
+            printf("Exiting....\n");
+            return;
+        default:
+            printf("Enter Valid option\n");
+            break;
+        }
+    }
+}
 
 // ========================== Student All Features List ==========================
 
