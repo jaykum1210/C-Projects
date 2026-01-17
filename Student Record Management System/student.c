@@ -2189,10 +2189,86 @@ void search_student_by_student_email(){
         {
             found = 1;
             print_all_information(stu_info.Stu_registration_number);
-            fclose(fp);
             break;
         }
     }
+    fclose(fp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+    }
+}
+
+// Search Student By Scholl Email Id
+
+void search_student_by_school_email(){
+    FILE *fp;
+    struct student_info stu_info;
+    int found = 0,ch;
+    char school_email_id[100];
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+    
+    fp = fopen("Student_information.dat","rb");
+    if (fp==NULL)
+    {
+        printf("File Not Open\n");
+        return;
+    }
+    
+    // Check Email Id 
+    readmail("Enter School Email Id : ",school_email_id,sizeof(school_email_id));
+
+    while (fread(&stu_info,sizeof(stu_info),1,fp))
+    {
+        if (strcmp(school_email_id,stu_info.Stu_School_email)==0)
+        {
+            found = 1;
+            print_all_information(stu_info.Stu_registration_number);
+            break;
+        }
+    }
+    fclose(fp);
+    if (!found)
+    {
+        printf("Student Not Found\n");
+    }
+}
+
+// Student Mobile Number
+
+void search_student_by_mobile(){
+    FILE *fp;
+    struct student_info stu_info;
+    int found = 0,ch;
+    char student_number[100];
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+    
+    fp = fopen("Student_information.dat","rb");
+    if (fp==NULL)
+    {
+        printf("File Not Open\n");
+        return;
+    }
+    
+    // Check Mobile Number
+    readmobilenumber("Enter Student Number : ",student_number,sizeof(student_number));
+
+    while (fread(&stu_info,sizeof(stu_info),1,fp))
+    {
+        if (strcmp(student_number,stu_info.stu_mobile_number)==0)
+        {
+            found = 1;
+            print_all_information(stu_info.Stu_registration_number);
+            break;
+        }
+    }
+    fclose(fp);
     if (!found)
     {
         printf("Student Not Found\n");
