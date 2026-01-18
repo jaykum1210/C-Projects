@@ -15,6 +15,8 @@
 #define MAX_AFTER_DIVIDE 30
 #define SHIFT_COUNT 10
 
+int LAST_FOUND_REGISTRATION = -1;
+
 // student informations
 
 struct student_info
@@ -61,6 +63,7 @@ struct student_academic_information
 
     char stu_subjects[MAX_SUBJECTS][SUBJECT_LEN]; // Subjects Enrolled to student
     int stu_subject_count;                        // Number of subject Enrolled
+    int stu_subject_numbers[MAX_SUBJECTS];
 
     float stu_last_percentage; // Last Year Percentage
     char stu_last_school[100]; // Last School Name
@@ -73,6 +76,12 @@ struct student_academic_information
     char stu_last_session_year[10]; // Last Session Year in 'YYYY-YYYY' Format
     char stu_academic_year[10];     // Current Session Year in 'YYYY-YYYY' Foramt
 };
+
+struct teacher_info
+{
+    
+};
+
 
 // Dashboard (Main Menu)
 
@@ -94,19 +103,43 @@ void student_dashboard()
     printf("\n=========================================================\n");
     printf("                     Student Dashboard                     \n");
     printf("\n=========================================================\n");
-    printf("1. Add Student Personal Details");
+    printf("1. Add Student Personal Details\n");
     printf("2. Add Academic Details\n");
     printf("3. See Student Academic Details.\n");
     printf("4. Update Student Information\n");
     printf("5. View All Students\n");
     printf("6. View Courses Assigned\n");
     printf("7. Search Student\n");
-    printf("8. Sort Student Records\n");
-    printf("9. View Student Result\n");
-    printf("10. Count Total Students\n");
-    printf("11. Delete Student Record\n");
-    printf("12. Exit\n");
+    printf("8. View Student Result\n");
+    printf("9. Count Total Students\n");
+    printf("10. Delete Student Record\n");
+    printf("11. Exit\n");
 }
+
+// Teacher Dashboard
+
+void teacher_dashboard()
+{
+    printf("\n==================== TEACHER DASHBOARD ====================\n");
+    printf("1. Add Teacher Personal Details\n");
+    printf("2. Add Teacher Professional Details\n");
+    printf("3. Update Teacher Information\n");
+    printf("4. View All Teachers\n");
+    printf("5. View Students Assigned to Teacher\n");
+    printf("6. View Courses Assigned to Teacher\n");
+    printf("7. Count Total Teachers\n");
+    printf("8. View Classes Assigned to Teacher\n");
+    printf("9. Assign Class to Teacher\n");
+    printf("10. Search Teacher\n");
+    printf("11. View Student Result\n");
+    printf("12. View Class Result\n");
+    printf("13. Add Marks\n");
+    printf("14. Exit\n");
+}
+
+// ==============================================================================
+// ============================== Student Function ==============================
+// ==============================================================================
 
 // Check Int Input in optoin choose
 
@@ -2029,6 +2062,7 @@ void print_all_information(int reg_number)
     struct student_info stu_info;
     struct student_academic_information stu_aca_info;
     int found1 = 0, found2 = 0;
+    LAST_FOUND_REGISTRATION = reg_number;
 
     // File Open
     fp1 = fopen("Student_information.dat", "rb");
@@ -2147,45 +2181,48 @@ void search_student_by_name()
 
 // Serach Student By Registration Number
 
-void search_student_by_registration(){
+void search_student_by_registration()
+{
     int reg_number;
 
     printf("Enter Registration Number : ");
-    scanf("%d",&reg_number);
+    scanf("%d", &reg_number);
     if (check_registration_number_exist(reg_number))
     {
         print_all_information(reg_number);
     }
-    else{
+    else
+    {
         printf("Student Not Found\n");
     }
 }
 
 // Search Student By Student Email Id
 
-void search_student_by_student_email(){
+void search_student_by_student_email()
+{
     FILE *fp;
     struct student_info stu_info;
-    int found = 0,ch;
+    int found = 0, ch;
     char student_email_id[100];
 
     // Clear Buffer
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
-    
-    fp = fopen("Student_information.dat","rb");
-    if (fp==NULL)
+
+    fp = fopen("Student_information.dat", "rb");
+    if (fp == NULL)
     {
         printf("File Not Open\n");
         return;
     }
-    
-    // Check Email Id 
-    readmail("Enter Student Email Id : ",student_email_id,sizeof(student_email_id));
 
-    while (fread(&stu_info,sizeof(stu_info),1,fp))
+    // Check Email Id
+    readmail("Enter Student Email Id : ", student_email_id, sizeof(student_email_id));
+
+    while (fread(&stu_info, sizeof(stu_info), 1, fp))
     {
-        if (strcmp(student_email_id,stu_info.stu_email)==0)
+        if (strcmp(student_email_id, stu_info.stu_email) == 0)
         {
             found = 1;
             print_all_information(stu_info.Stu_registration_number);
@@ -2201,29 +2238,30 @@ void search_student_by_student_email(){
 
 // Search Student By Scholl Email Id
 
-void search_student_by_school_email(){
+void search_student_by_school_email()
+{
     FILE *fp;
     struct student_info stu_info;
-    int found = 0,ch;
+    int found = 0, ch;
     char school_email_id[100];
 
     // Clear Buffer
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
-    
-    fp = fopen("Student_information.dat","rb");
-    if (fp==NULL)
+
+    fp = fopen("Student_information.dat", "rb");
+    if (fp == NULL)
     {
         printf("File Not Open\n");
         return;
     }
-    
-    // Check Email Id 
-    readmail("Enter School Email Id : ",school_email_id,sizeof(school_email_id));
 
-    while (fread(&stu_info,sizeof(stu_info),1,fp))
+    // Check Email Id
+    readmail("Enter School Email Id : ", school_email_id, sizeof(school_email_id));
+
+    while (fread(&stu_info, sizeof(stu_info), 1, fp))
     {
-        if (strcmp(school_email_id,stu_info.Stu_School_email)==0)
+        if (strcmp(school_email_id, stu_info.Stu_School_email) == 0)
         {
             found = 1;
             print_all_information(stu_info.Stu_registration_number);
@@ -2239,29 +2277,30 @@ void search_student_by_school_email(){
 
 // Student Mobile Number
 
-void search_student_by_mobile(){
+void search_student_by_mobile()
+{
     FILE *fp;
     struct student_info stu_info;
-    int found = 0,ch;
+    int found = 0, ch;
     char student_number[100];
 
     // Clear Buffer
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
-    
-    fp = fopen("Student_information.dat","rb");
-    if (fp==NULL)
+
+    fp = fopen("Student_information.dat", "rb");
+    if (fp == NULL)
     {
         printf("File Not Open\n");
         return;
     }
-    
-    // Check Mobile Number
-    readmobilenumber("Enter Student Number : ",student_number,sizeof(student_number));
 
-    while (fread(&stu_info,sizeof(stu_info),1,fp))
+    // Check Mobile Number
+    readmobilenumber("Enter Student Number : ", student_number, sizeof(student_number));
+
+    while (fread(&stu_info, sizeof(stu_info), 1, fp))
     {
-        if (strcmp(student_number,stu_info.stu_mobile_number)==0)
+        if (strcmp(student_number, stu_info.stu_mobile_number) == 0)
         {
             found = 1;
             print_all_information(stu_info.Stu_registration_number);
@@ -2330,6 +2369,273 @@ void search_student()
     }
 }
 
+// ========================== View All Student Function items ==========================
+
+// Print Result
+
+void print_student_result()
+{
+    FILE *fp;
+    struct student_academic_information stu_aca_info;
+
+    fp = fopen("Student_academic.dat", "rb");
+    if (fp == NULL)
+    {
+        printf("File Not Open\n");
+        return;
+    }
+
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp))
+    {
+        if (LAST_FOUND_REGISTRATION == stu_aca_info.stu_registration_number)
+        {
+            for (int i = 0; i < stu_aca_info.stu_subject_count; i++)
+            {
+                printf("%s : %d\n", stu_aca_info.stu_subjects[i], stu_aca_info.stu_subject_numbers[i]);
+            }
+            fclose(fp);
+            return;
+        }
+    }
+    fclose(fp);
+    printf("Student Not Found\n");
+}
+
+// View Student Result Main Function
+
+void view_student_result()
+{
+    int ch;
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    search_student_by_registration();
+
+    // Print Result
+    print_student_result();
+}
+
+// ========================== Count Total Student ==========================
+
+// Total Number of Students in Class
+
+int student_number_class(int stu_class)
+{
+    FILE *fp;
+    int ch, count = 0;
+    struct student_academic_information stu_aca_info;
+
+    // Open File
+    fp = fopen("Student_academic.dat", "rb");
+    if (fp == NULL)
+    {
+        printf("File Not Open\n");
+        return 0;
+    }
+
+    // Count Number of Students
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp))
+    {
+        if (stu_class == stu_aca_info.stu_class)
+        {
+            count++;
+        }
+    }
+    fclose(fp);
+    return count;
+}
+
+// Count Number of Students in Section
+
+int student_number_section(int stu_class, char stu_section)
+{
+    FILE *fp;
+    int ch, count = 0;
+    struct student_academic_information stu_aca_info;
+
+    // Open File
+    fp = fopen("Student_academic.dat", "rb");
+    if (fp == NULL)
+    {
+        printf("File Not Open\n");
+        return 0;
+    }
+
+    // Count Number of Students
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp))
+    {
+        if (stu_class == stu_aca_info.stu_class && stu_section == stu_aca_info.stu_section)
+        {
+            count++;
+        }
+    }
+    fclose(fp);
+    return count;
+}
+
+// Count Total Students in School
+
+int total_number_student()
+{
+    FILE *fp;
+    struct student_info stu_info;
+    int count = 0;
+
+    fp = fopen("Student_information.dat", "rb");
+    if (!fp)
+        return 0;
+
+    while (fread(&stu_info, sizeof(stu_info), 1, fp))
+        count++;
+
+    fclose(fp);
+    return count;
+}
+
+// Count Student
+
+void count_total_student()
+{
+    int stu_class;
+    char stu_section;
+    int ch;
+    int stu_total_class, stu_total_section, stu_total;
+
+    // Clear Buffer
+
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    // Check Class and Section
+
+    readclass("Enter Class : ", &stu_class);
+    readsection("Enter Section : ", stu_class, &stu_section);
+
+    stu_total_class = student_number_class(stu_class);
+    stu_total_section = student_number_section(stu_class, stu_section);
+    stu_total = total_number_student();
+
+    printf("Total Number of Students in Class %d : %d\n", stu_class, stu_total_class);
+
+    printf("Total Number of Students in Class %d and Section %c = %d\n", stu_class, stu_section, stu_total_section);
+
+    printf("Total Number of Students in School : %d\n", stu_total);
+}
+
+// ========================== Delete Student ==========================
+
+// Delete Student Information
+
+int delete_student_information(int stu_reg)
+{
+    FILE *fp, *temp;
+    struct student_info stu_info;
+    int found = 0;
+
+    fp = fopen("Student_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("File Not Open\n");
+        return 0;
+    }
+
+    while (fread(&stu_info, sizeof(stu_info), 1, fp))
+    {
+        if (stu_reg == stu_info.Stu_registration_number)
+        {
+            found = 1;
+            continue;
+        }
+        fwrite(&stu_info, sizeof(stu_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+
+    remove("Student_information.dat");
+    rename("temp.dat", "Student_information.dat");
+
+    return found;
+}
+
+// Delete Student Academic Information
+
+void delete_student_academic_info(int stu_reg)
+{
+    FILE *fp, *temp;
+    struct student_academic_information stu_aca_info;
+    int found = 0;
+
+    fp = fopen("Student_academic.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("File Not Found\n");
+        return;
+    }
+
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp))
+    {
+        if (stu_reg == stu_aca_info.stu_registration_number)
+        {
+            found = 1;
+            continue;
+        }
+        fwrite(&stu_aca_info, sizeof(stu_aca_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+
+    remove("Student_academic.dat");
+    rename("temp.dat", "Student_academic.dat");
+}
+
+// Delete Student Main Function
+
+void delete_student()
+{
+    int ch, stu_reg_num;
+
+    while (1)
+    {
+        printf("Enter Registration Number : ");
+
+        if (scanf("%d", &stu_reg_num) != 1)
+        {
+            printf("Invalid input! Numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        // Clear buffer after valid input
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
+        if (!check_registration_number_exist(stu_reg_num))
+        {
+            printf("Student Not Found\n");
+            continue;
+        }
+
+        if (delete_student_information(stu_reg_num))
+        {
+            delete_student_academic_info(stu_reg_num);
+            printf("Student Deleted Successfully\n");
+            return;
+        }
+        else
+        {
+            printf("Deletion Failed\n");
+            return;
+        }
+    }
+}
+
 // ========================== Student All Features List ==========================
 
 // Student Feature Select
@@ -2360,22 +2666,78 @@ void student_features(int feature_choice)
         search_student(); // Search Student according to - id, Registration number, gmail, name etc.
         break;
     case 8:
-        sort_student_record(); // Sort all Student Details by name, registration number, etc.
-        break;
-    case 9:
         view_student_result(); // View Student Result
         break;
-    case 10:
+    case 9:
         count_total_student(); // View number of students in school, class and section
         break;
-    case 11:
+    case 10:
         delete_student(); // Delete Student Detail
         break;
-    case 12:
+    case 11:
         printf("Exiting....\n"); // Exit Student Feature
         break;
     default:
         printf("Invalid Choice! Try Again.\n"); // Invalid Choice
+        break;
+    }
+}
+
+// ==============================================================================
+// ============================== Teacher Function ==============================
+// ==============================================================================
+
+// ========================== Add Teacher Information Function Items==========================
+
+// Teacher Features List
+
+void teacher_features(int feature_option){
+    switch (feature_option)
+    {
+    case 1:
+        add_teacher_information();
+        break;
+    case 2:
+        add_teacher_professional_information();
+        break;
+    case 3:
+        update_teacher_information();
+        break;
+    case 4:
+        view_all_teachers();
+        break;
+    case 5:
+        view_student_under();
+        break;
+    case 6:
+        view_courses_under();
+        break;
+    case 7:
+        view_total_student_under();
+        break;
+    case 8:
+        view_class_section_under();
+        break;
+    case 9:
+        assign_new_class();
+        break;
+    case 10:
+        search_teacher();
+        break;
+    case 11:
+        view_student_result();
+        break;
+    case 12:
+        view_class_result();
+        break;
+    case 13:
+        add_result();
+        break;
+    case 14:
+        printf("Exiting...\n");
+        break;
+    default:
+        printf("Enter valid Option\n");
         break;
     }
 }
@@ -2385,7 +2747,7 @@ void student_features(int feature_choice)
 // Main Function
 int main()
 {
-    int dashboard_option, student_option;
+    int dashboard_option = 0, option = 0;
     while (dashboard_option != 4)
     {
 
@@ -2412,26 +2774,47 @@ int main()
 
             // Invalid Option Check
 
-            if (!readInt(&student_dashboard))
+            if (!readInt(&option))
             {
                 continue;
             }
-            while (student_dashboard != 12)
+            if (option == 11)
             {
-                student_features(student_dashboard);
+                break;
             }
 
+            student_features(option);
             break;
+
         case 2:
+            // Calling Teacher Dashboard
             teacher_dashboard();
+
+            printf("Enter your choice = ");
+
+            // Invalid Option Check
+
+            if (!readInt(&option))
+            {
+                continue;
+            }
+            if (option == 14)
+            {
+                break;
+            }
+
+            teacher_features(option);
             break;
+
         case 3:
             parent_dashboard();
             break;
+
         case 4:
             printf("Exiting....\n");
             exit(0);
             break;
+
         default:
             printf("Invalid Choice! Try Again.\n");
             break;
