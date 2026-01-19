@@ -82,7 +82,6 @@ struct teacher_info
     
 };
 
-
 // Dashboard (Main Menu)
 
 void main_menu()
@@ -2691,7 +2690,8 @@ void student_features(int feature_choice)
 
 // Teacher Features List
 
-void teacher_features(int feature_option){
+void teacher_features(int feature_option)
+{
     switch (feature_option)
     {
     case 1:
