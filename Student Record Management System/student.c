@@ -15,6 +15,8 @@
 #define MAX_AFTER_DIVIDE 30
 #define SHIFT_COUNT 10
 
+#define MAX_SUBJECT_TEACH 5
+
 int LAST_FOUND_REGISTRATION = -1;
 
 // student informations
@@ -50,7 +52,7 @@ struct student_info
     char Stu_School_email[100];  // Auto Generate By Combining firstname + lastname + registration_number + "@cprojects.com"
 };
 
-// Add Student Acaedmic Data
+// Student Acaedmic Data
 
 struct student_academic_information
 {
@@ -77,10 +79,40 @@ struct student_academic_information
     char stu_academic_year[10];     // Current Session Year in 'YYYY-YYYY' Foramt
 };
 
+// Teacher Information
+
 struct teacher_info
 {
-    
+    char teach_firstname[50];
+    char teach_middlename[50];
+    char teach_lastname[50];
+
+    char teach_email[100];
+    char teach_mobile_number[15];
+
+    char teach_gender[10];
+    char teach_DOB[11];
+    char teach_caste[20];
+
+    char teach_street[50];
+    char teach_area[50];
+    char teach_city[50];
+    char teach_state[50];
+    int teach_zipcode;
+
+    // Auto Generate Items
+
+    int teach_registration_number; // Auto Generate From 10000
+    char teach_School_email[100];  // Auto Generate By Combining firstname + lastname + registration_number + "@cprojects.com"
 };
+
+// Teacher Academic Data
+
+struct teacher_academic_information{
+    int teach_registration_number;
+
+    char 
+}
 
 // Dashboard (Main Menu)
 
