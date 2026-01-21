@@ -15,6 +15,7 @@
 #define MAX_AFTER_DIVIDE 30
 #define SHIFT_COUNT 10
 
+#define MAX_CLASSES 3
 #define MAX_SUBJECT_TEACH 5
 
 int LAST_FOUND_REGISTRATION = -1;
@@ -109,10 +110,28 @@ struct teacher_info
 // Teacher Academic Data
 
 struct teacher_academic_information{
-    int teach_registration_number;
 
-    char 
-}
+    int teacher_registration_number;                            // Unique Teacher Registration Number
+    
+    char teacher_designation[50];                               // Designation (PRT, TGT, PGT, Professor, etc.)
+    char teacher_employment_type[20];                           // Permanent / Contract / Visiting
+    
+    char teacher_qualification[100];                            // Overall Qualification
+    char teacher_highest_qualification[100];                    // Highest Qualification
+    char teacher_specialization[100];                           // Subject Specialization
+    
+    int teacher_experience_years;                               // Total Teaching Experience in Years
+    int teacher_joining_year;                                   // Year of Joining the Institution
+    
+    char teacher_subjects[MAX_SUBJECTS][SUBJECT_LEN];           // Subjects Taught
+    int teacher_subject_count;                                  // Number of Subjects Taught
+    
+    int teacher_preferred_classes[MAX_CLASSES];                 // Preferred Classes (e.g., 6,7,8,9,10)
+    int teacher_preferred_class_count;                          // Number of Preferred Classes
+    
+    char teacher_school_email[100];                             // Auto-generated School Email
+
+};
 
 // Dashboard (Main Menu)
 
@@ -2719,6 +2738,8 @@ void student_features(int feature_choice)
 // ==============================================================================
 
 // ========================== Add Teacher Information Function Items==========================
+
+
 
 // Teacher Features List
 
