@@ -2739,7 +2739,9 @@ void student_features(int feature_choice)
 
 // ========================== Add Teacher Information Function Items==========================
 
-
+void add_teacher_information(){
+    
+}
 
 // Teacher Features List
 
