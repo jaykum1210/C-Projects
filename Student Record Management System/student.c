@@ -88,18 +88,18 @@ struct teacher_info
     char teach_middlename[50];
     char teach_lastname[50];
 
-    char teach_email[100];
+    char teach_email[100];              // Should contain "@gmail.com"
     char teach_mobile_number[15];
 
-    char teach_gender[10];
-    char teach_DOB[11];
+    char teach_DOB[11];                 // DD/MM/YYYY
+    char teach_gender[10];              // M / F / O
     char teach_caste[20];
 
     char teach_street[50];
     char teach_area[50];
     char teach_city[50];
     char teach_state[50];
-    int teach_zipcode;
+    int teach_zipcode;                  // Only 6 Digits
 
     // Auto Generate Items
 
@@ -209,7 +209,7 @@ int readInt(int *var)
 
 // Gennerate Registration Number
 
-int generate_registration_number()
+int generate_student_registration_number()
 {
     FILE *fp;
     struct student_info st_info;
@@ -518,7 +518,7 @@ void readzipcode(char *msg, int *zipcode_number)
 
 // Generate School Gmail Id
 
-void generate_student_email(char *firstname, char *lastname, int reg_num, char *email, int size)
+void generate_school_email(char *firstname, char *lastname, int reg_num, char *email, int size)
 {
     char fname[50], lname[50];
 
@@ -560,7 +560,7 @@ void add_student_personal_info()
     }
 
     // Registration Number
-    st_in.Stu_registration_number = generate_registration_number();
+    st_in.Stu_registration_number = generate_student_registration_number();
 
     readrequiredstring("Enter First Name : ", st_in.stu_firstname, sizeof(st_in.stu_firstname));                   // Enter First Name
     readoptionalstring("Enter Middle Name : ", st_in.stu_middlename, sizeof(st_in.stu_middlename));                // Enter Middle Name
@@ -581,7 +581,7 @@ void add_student_personal_info()
     readrequiredstring("Enter State : ", st_in.stu_state, sizeof(st_in.stu_state));                                // Enter State
     readzipcode("Enter Zipcode : ", &st_in.stu_zipcode);                                                           // Enter Zipcode in 6 digit only
 
-    generate_student_email( // School Gmail Id (Autogenerate)
+    generate_school_email( // School Gmail Id (Autogenerate)
         st_in.stu_firstname,
         st_in.stu_lastname,
         st_in.Stu_registration_number,
@@ -698,7 +698,7 @@ void assign_subjects(struct student_academic_information *stu_aca_info)
 
 // Check Registration Number exist or not
 
-int check_registration_number_exist(int reg_number)
+int check_student_registration_number(int reg_number)
 {
     FILE *fp;
     struct student_info stu_info;
@@ -1076,7 +1076,7 @@ void add_student_academic_info()
         while ((ch = getchar()) != '\n' && ch != EOF)
             ;
 
-        if (!check_registration_number_exist(st_academic.stu_registration_number))
+        if (!check_student_registration_number(st_academic.stu_registration_number))
         {
             printf("Registration number not found! Please enter a valid one.\n");
             continue;
@@ -1226,7 +1226,7 @@ void see_student_academic_details()
             ;
 
         /* -------- STUDENT NOT FOUND -------- */
-        if (!check_registration_number_exist(registration_number))
+        if (!check_student_registration_number(registration_number))
         {
             printf("Student not found!\n");
 
@@ -1782,7 +1782,7 @@ void update_student_info()
         while ((ch = getchar()) != '\n' && ch != EOF)
             ;
 
-        if (!check_registration_number_exist(st_in.Stu_registration_number))
+        if (!check_student_registration_number(st_in.Stu_registration_number))
         {
             printf("Registration number not found! Please enter a valid one.\n");
             continue;
@@ -2091,7 +2091,7 @@ void view_courses()
         while ((ch = getchar()) != '\n' && ch != EOF)
             ;
 
-        if (!check_registration_number_exist(st_academic.stu_registration_number))
+        if (!check_student_registration_number(st_academic.stu_registration_number))
         {
             printf("Registration number not found! Please enter a valid one.\n");
             continue;
@@ -2237,7 +2237,7 @@ void search_student_by_registration()
 
     printf("Enter Registration Number : ");
     scanf("%d", &reg_number);
-    if (check_registration_number_exist(reg_number))
+    if (check_student_registration_number(reg_number))
     {
         print_all_information(reg_number);
     }
@@ -2666,7 +2666,7 @@ void delete_student()
         while ((ch = getchar()) != '\n' && ch != EOF)
             ;
 
-        if (!check_registration_number_exist(stu_reg_num))
+        if (!check_student_registration_number(stu_reg_num))
         {
             printf("Student Not Found\n");
             continue;
@@ -2739,7 +2739,133 @@ void student_features(int feature_choice)
 
 // ========================== Add Teacher Information Function Items==========================
 
+// Generate Teacher Registration Number
+
+int generate_teacher_registration_number(){
+    FILE *fp;
+    struct teacher_info teach_info;
+
+    fp = fopen("Teacher_information.dat","rb");
+
+    // If File not exist -> First Teacher
+    if (fp == NULL)
+    {
+        fclose(fp);
+       return 10000;
+    }
+    fseek(fp, 0, SEEK_END);
+
+    // If File Is Empty
+    if (ftell(fp) == 0)
+    {
+        fclose(fp);
+        return 10000;
+    }
+
+    // Move pointer to last Teacher record
+    fseek(fp, -sizeof(struct teacher_info), SEEK_END);
+
+    // Read last teacher
+    if (fread(&teach_info, sizeof(struct teacher_info), 1, fp) != 1)
+    {
+        fclose(fp);
+        return 10000;
+    }
+
+    // Close File
+    fclose(fp);
+
+    return teach_info.teach_registration_number + 1;
+}
+
+// Add Teacher Information Function
+
 void add_teacher_information(){
+    FILE *fp;
+    struct teacher_info teach_info;
+    int ch;
+
+    // Clear Buffer
+    while((ch = getchar())!='\n' && ch !=EOF);
+
+    fp = fopen("Teacher_information.dat", "ab");
+    if (fp==NULL)
+    {
+        printf("Error: Unable To Open Teacher File\n");
+        return;
+    }
+    
+    // Registration Number
+    teach_info.teach_registration_number = generate_teacher_registration_number();                                          // Generated egistration Number
+    readrequiredstring("Enter First Name : ",teach_info.teach_firstname,sizeof(teach_info.teach_firstname));                // Enter First Name
+    readoptionalstring("Enter Middle Name : ",teach_info.teach_middlename,sizeof(teach_info.teach_middlename));             // Enter Middle Name
+    readrequiredstring("Enter Last Name : ",teach_info.teach_lastname,sizeof(teach_info.teach_lastname));                   // Enter Last Name
+    readmail("Enter Gmail Address : ",teach_info.teach_email,sizeof(teach_info.teach_email));                               // Enter Personal Gmail Id
+    readmobilenumber("Enter Mobile Number : ",teach_info.teach_mobile_number,sizeof(teach_info.teach_mobile_number));       // Enter Mobile Number
+    readgender("Enter Gender (M/F/O) : ",teach_info.teach_gender,sizeof(teach_info.teach_gender));                         // Enter Gender in 'M'/'F'/'O'
+    readcaste("Enter Caste (Gen/OBC/SC/ST) : ",teach_info.teach_caste,sizeof(teach_info.teach_caste));                      // Enter Caste - 'OBC'/'GEN'/'ST'/'SC'
+    readrequiredstring("Enter Street Name : ",teach_info.teach_street,sizeof(teach_info.teach_street));                     // Enter Street Name
+    readrequiredstring("Enter Area Name : ",teach_info.teach_area,sizeof(teach_info.teach_area));                           // Enter Area Name
+    readrequiredstring("Enter city Name : ",teach_info.teach_city,sizeof(teach_info.teach_city));                           // Enter City Name
+    readrequiredstring("Enter State : ",teach_info.teach_state,sizeof(teach_info.teach_state));                             // Enter Stste
+    readzipcode("Enter Zipcode : ",&teach_info.teach_zipcode);                                                              // Enter Zipcode in 6 digit code
+
+
+    // School Email Id
+
+    generate_school_email(
+        teach_info.teach_firstname,
+        teach_info.teach_lastname,
+        teach_info.teach_registration_number,
+        teach_info.teach_School_email,
+        sizeof(teach_info.teach_School_email));
+    
+    printf("Generated Registration Number : %d\n",teach_info.teach_registration_number);
+    printf("Generated School Gmail Id : %s\n",teach_info.teach_School_email);
+    
+    fwrite(&teach_info,sizeof(struct teacher_info),1,fp);
+    fclose(fp);
+}
+
+// Add Teacher Professional Information
+
+void add_teacher_professional_information(){
+    FILE *fp;
+    struct teacher_academic_information teach_aca_info;
+    int ch, valid_reg = 0;
+
+    // Clear Buffer
+    while((ch = getchar())!='\n' && ch!=EOF);
+
+    fp = fopen("Teacher_Academic.dat", "ab");
+    if (fp=NULL)
+    {
+        printf("Error: Unable to open Academic File!\n");
+        return;
+    }
+    
+    while (!valid_reg)
+    {
+        printf("Enter Registration Number : ");
+
+        if (scanf("%d",&teach_aca_info.teacher_registration_number))
+        {
+            printf("Invalid input! Enter numbers only.\n");
+            while((ch = getchar())!='\n' && ch!=EOF);
+            continue;
+        }
+        
+        // Clear Buffer
+        while ((ch = getchar())!='\n' && ch !=EOF);
+        
+        if (!check_teacher_registration_number(teach_aca_info.teacher_registration_number))
+        {
+            printf("Registration number not found! Please enter valid registration number\n");
+            continue;
+        }
+        valid_reg = 1; // Exit Loop
+    }
+    
     
 }
 
