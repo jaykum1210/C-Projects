@@ -16,7 +16,8 @@
 #define SHIFT_COUNT 10
 
 #define MAX_CLASSES 3
-#define MAX_SUBJECT_TEACH 5
+#define MAX_SUBJECT_TEACH 4
+#define MAX_TEACHERS 200
 
 int LAST_FOUND_REGISTRATION = -1;
 
@@ -64,8 +65,8 @@ struct student_academic_information
     int stu_section_count;
     char stream[10]; // Stream of student only if the class is greater than 10
 
-    char stu_subjects[MAX_SUBJECTS][SUBJECT_LEN]; // Subjects Enrolled to student
     int stu_subject_count;                        // Number of subject Enrolled
+    char stu_subjects[MAX_SUBJECTS][SUBJECT_LEN]; // Subjects Enrolled to student
     int stu_subject_numbers[MAX_SUBJECTS];
 
     float stu_last_percentage; // Last Year Percentage
@@ -88,18 +89,18 @@ struct teacher_info
     char teach_middlename[50];
     char teach_lastname[50];
 
-    char teach_email[100];              // Should contain "@gmail.com"
+    char teach_email[100]; // Should contain "@gmail.com"
     char teach_mobile_number[15];
 
-    char teach_DOB[11];                 // DD/MM/YYYY
-    char teach_gender[10];              // M / F / O
+    char teach_DOB[11];    // DD/MM/YYYY
+    char teach_gender[10]; // M / F / O
     char teach_caste[20];
 
     char teach_street[50];
     char teach_area[50];
     char teach_city[50];
     char teach_state[50];
-    int teach_zipcode;                  // Only 6 Digits
+    int teach_zipcode; // Only 6 Digits
 
     // Auto Generate Items
 
@@ -109,28 +110,26 @@ struct teacher_info
 
 // Teacher Academic Data
 
-struct teacher_academic_information{
+struct teacher_academic_information
+{
 
-    int teacher_registration_number;                            // Unique Teacher Registration Number
-    
-    char teacher_designation[50];                               // Designation (PRT, TGT, PGT, Professor, etc.)
-    char teacher_employment_type[20];                           // Permanent / Contract / Visiting
-    
-    char teacher_qualification[100];                            // Overall Qualification
-    char teacher_highest_qualification[100];                    // Highest Qualification
-    char teacher_specialization[100];                           // Subject Specialization
-    
-    int teacher_experience_years;                               // Total Teaching Experience in Years
-    int teacher_joining_year;                                   // Year of Joining the Institution
-    
-    char teacher_subjects[MAX_SUBJECTS][SUBJECT_LEN];           // Subjects Taught
-    int teacher_subject_count;                                  // Number of Subjects Taught
-    
-    int teacher_preferred_classes[MAX_CLASSES];                 // Preferred Classes (e.g., 6,7,8,9,10)
-    int teacher_preferred_class_count;                          // Number of Preferred Classes
-    
-    char teacher_school_email[100];                             // Auto-generated School Email
+    int teacher_registration_number; // Unique Teacher Registration Number
 
+    char teacher_designation[50];     // Designation (PRT, TGT, PGT, Professor, Assistant Professor)
+    char teacher_employment_type[20]; // Permanent / Contract / Visiting
+
+    char teacher_highest_qualification[100]; // Highest Qualification
+    char teacher_specialization[100];        // Subject Specialization
+    int teacher_experience_years;            // Total Teaching Experience in Years
+    int teacher_joining_year;                // Year of Joining the Institution
+
+    char teaching_level[20]; // Pre-Primary / Primary / Secondary / Senior Secondary
+
+    int teacher_subject_count;                        // Number of Subjects Taught
+    char teacher_subjects[MAX_SUBJECTS][SUBJECT_LEN]; // Subjects Taught
+
+    int teacher_preferred_class_count;          // Number of Preferred Classes
+    int teacher_preferred_classes[MAX_CLASSES]; // Preferred Classes (e.g., 6,7,8,9,10)
 };
 
 // Dashboard (Main Menu)
@@ -2741,17 +2740,18 @@ void student_features(int feature_choice)
 
 // Generate Teacher Registration Number
 
-int generate_teacher_registration_number(){
+int generate_teacher_registration_number()
+{
     FILE *fp;
     struct teacher_info teach_info;
 
-    fp = fopen("Teacher_information.dat","rb");
+    fp = fopen("Teacher_information.dat", "rb");
 
     // If File not exist -> First Teacher
     if (fp == NULL)
     {
         fclose(fp);
-       return 10000;
+        return 10000;
     }
     fseek(fp, 0, SEEK_END);
 
@@ -2780,36 +2780,37 @@ int generate_teacher_registration_number(){
 
 // Add Teacher Information Function
 
-void add_teacher_information(){
+void add_teacher_information()
+{
     FILE *fp;
     struct teacher_info teach_info;
     int ch;
 
     // Clear Buffer
-    while((ch = getchar())!='\n' && ch !=EOF);
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
 
     fp = fopen("Teacher_information.dat", "ab");
-    if (fp==NULL)
+    if (fp == NULL)
     {
         printf("Error: Unable To Open Teacher File\n");
         return;
     }
-    
-    // Registration Number
-    teach_info.teach_registration_number = generate_teacher_registration_number();                                          // Generated egistration Number
-    readrequiredstring("Enter First Name : ",teach_info.teach_firstname,sizeof(teach_info.teach_firstname));                // Enter First Name
-    readoptionalstring("Enter Middle Name : ",teach_info.teach_middlename,sizeof(teach_info.teach_middlename));             // Enter Middle Name
-    readrequiredstring("Enter Last Name : ",teach_info.teach_lastname,sizeof(teach_info.teach_lastname));                   // Enter Last Name
-    readmail("Enter Gmail Address : ",teach_info.teach_email,sizeof(teach_info.teach_email));                               // Enter Personal Gmail Id
-    readmobilenumber("Enter Mobile Number : ",teach_info.teach_mobile_number,sizeof(teach_info.teach_mobile_number));       // Enter Mobile Number
-    readgender("Enter Gender (M/F/O) : ",teach_info.teach_gender,sizeof(teach_info.teach_gender));                         // Enter Gender in 'M'/'F'/'O'
-    readcaste("Enter Caste (Gen/OBC/SC/ST) : ",teach_info.teach_caste,sizeof(teach_info.teach_caste));                      // Enter Caste - 'OBC'/'GEN'/'ST'/'SC'
-    readrequiredstring("Enter Street Name : ",teach_info.teach_street,sizeof(teach_info.teach_street));                     // Enter Street Name
-    readrequiredstring("Enter Area Name : ",teach_info.teach_area,sizeof(teach_info.teach_area));                           // Enter Area Name
-    readrequiredstring("Enter city Name : ",teach_info.teach_city,sizeof(teach_info.teach_city));                           // Enter City Name
-    readrequiredstring("Enter State : ",teach_info.teach_state,sizeof(teach_info.teach_state));                             // Enter Stste
-    readzipcode("Enter Zipcode : ",&teach_info.teach_zipcode);                                                              // Enter Zipcode in 6 digit code
 
+    // Registration Number
+    teach_info.teach_registration_number = generate_teacher_registration_number();                                      // Generated egistration Number
+    readrequiredstring("Enter First Name : ", teach_info.teach_firstname, sizeof(teach_info.teach_firstname));          // Enter First Name
+    readoptionalstring("Enter Middle Name : ", teach_info.teach_middlename, sizeof(teach_info.teach_middlename));       // Enter Middle Name
+    readrequiredstring("Enter Last Name : ", teach_info.teach_lastname, sizeof(teach_info.teach_lastname));             // Enter Last Name
+    readmail("Enter Gmail Address : ", teach_info.teach_email, sizeof(teach_info.teach_email));                         // Enter Personal Gmail Id
+    readmobilenumber("Enter Mobile Number : ", teach_info.teach_mobile_number, sizeof(teach_info.teach_mobile_number)); // Enter Mobile Number
+    readgender("Enter Gender (M/F/O) : ", teach_info.teach_gender, sizeof(teach_info.teach_gender));                    // Enter Gender in 'M'/'F'/'O'
+    readcaste("Enter Caste (Gen/OBC/SC/ST) : ", teach_info.teach_caste, sizeof(teach_info.teach_caste));                // Enter Caste - 'OBC'/'GEN'/'ST'/'SC'
+    readrequiredstring("Enter Street Name : ", teach_info.teach_street, sizeof(teach_info.teach_street));               // Enter Street Name
+    readrequiredstring("Enter Area Name : ", teach_info.teach_area, sizeof(teach_info.teach_area));                     // Enter Area Name
+    readrequiredstring("Enter city Name : ", teach_info.teach_city, sizeof(teach_info.teach_city));                     // Enter City Name
+    readrequiredstring("Enter State : ", teach_info.teach_state, sizeof(teach_info.teach_state));                       // Enter Stste
+    readzipcode("Enter Zipcode : ", &teach_info.teach_zipcode);                                                         // Enter Zipcode in 6 digit code
 
     // School Email Id
 
@@ -2819,45 +2820,55 @@ void add_teacher_information(){
         teach_info.teach_registration_number,
         teach_info.teach_School_email,
         sizeof(teach_info.teach_School_email));
-    
-    printf("Generated Registration Number : %d\n",teach_info.teach_registration_number);
-    printf("Generated School Gmail Id : %s\n",teach_info.teach_School_email);
-    
-    fwrite(&teach_info,sizeof(struct teacher_info),1,fp);
+
+    printf("Generated Registration Number : %d\n", teach_info.teach_registration_number);
+    printf("Generated School Gmail Id : %s\n", teach_info.teach_School_email);
+
+    fwrite(&teach_info, sizeof(struct teacher_info), 1, fp);
     fclose(fp);
+}
+
+// ========================== Add Teacher Professional Information Function Items==========================
+
+void readdesignation(char *msg,char *str, int size){
+
 }
 
 // Add Teacher Professional Information
 
-void add_teacher_professional_information(){
+void add_teacher_professional_information()
+{
     FILE *fp;
     struct teacher_academic_information teach_aca_info;
     int ch, valid_reg = 0;
 
     // Clear Buffer
-    while((ch = getchar())!='\n' && ch!=EOF);
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
 
     fp = fopen("Teacher_Academic.dat", "ab");
-    if (fp=NULL)
+    if (fp == NULL)
     {
         printf("Error: Unable to open Academic File!\n");
         return;
     }
-    
+
     while (!valid_reg)
     {
         printf("Enter Registration Number : ");
 
-        if (scanf("%d",&teach_aca_info.teacher_registration_number))
+        if (scanf("%d", &teach_aca_info.teacher_registration_number) != 1)
         {
             printf("Invalid input! Enter numbers only.\n");
-            while((ch = getchar())!='\n' && ch!=EOF);
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
             continue;
         }
-        
+
         // Clear Buffer
-        while ((ch = getchar())!='\n' && ch !=EOF);
-        
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
         if (!check_teacher_registration_number(teach_aca_info.teacher_registration_number))
         {
             printf("Registration number not found! Please enter valid registration number\n");
@@ -2865,10 +2876,24 @@ void add_teacher_professional_information(){
         }
         valid_reg = 1; // Exit Loop
     }
-    
-    readdesignation("Enter Designation : ",teach_aca_info.teacher_designation,sizeof(teach_aca_info.teacher_designation));
-    reademploymenttype("Enter Emplyee Type : ",teach_aca_info.teacher_employment_type,sizeof(teach_aca_info.teacher_employment_type));
-    readqualification
+
+    readrequiredstring("Enter Designation : ", teach_aca_info.teacher_designation, sizeof(teach_aca_info.teacher_designation));                                             // Designation (PRT, TRT, PGT, Professor,Assistant Professor, etc.)
+    reademploymenttype("Enter Employee Type : ", teach_aca_info.teacher_employment_type, sizeof(teach_aca_info.teacher_employment_type));                                   // Permanent, Contract, Visiting
+    readhighestqualification("Enter Highest Qualification : ", teach_aca_info.teacher_highest_qualification, sizeof(teach_aca_info.teacher_highest_qualification));         
+    readspecialization("Enter Specialization : ", teach_aca_info.teacher_specialization, sizeof(teach_aca_info.teacher_specialization));
+    printf("Enter Number of Years of Experience : ");
+    readInt(&teach_aca_info.teacher_experience_years);
+    printf("Enter Joining Year : ");
+    readInt(&teach_aca_info.teacher_joining_year);
+    readteachinglevel("Enter Teaching Level : ", teach_aca_info.teaching_level, sizeof(teach_aca_info.teaching_level));
+    printf("Enter Number of Subjects You Want to Teach : ");
+    readInt(&teach_aca_info.teacher_subject_count);
+    readsubjects_takes(teach_aca_info.teacher_subjects, teach_aca_info.teacher_subject_count);
+    readnumberclasses("Enter Number of Classes You Want to Teach : ", &teach_aca_info.teacher_preferred_class_count);
+    readclassestakes(teach_aca_info.teacher_preferred_classes, teach_aca_info.teacher_preferred_class_count);
+
+    fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, fp);
+    fclose(fp);
 }
 
 // Teacher Features List
