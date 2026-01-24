@@ -2866,7 +2866,9 @@ void add_teacher_professional_information(){
         valid_reg = 1; // Exit Loop
     }
     
-    
+    readdesignation("Enter Designation : ",teach_aca_info.teacher_designation,sizeof(teach_aca_info.teacher_designation));
+    reademploymenttype("Enter Emplyee Type : ",teach_aca_info.teacher_employment_type,sizeof(teach_aca_info.teacher_employment_type));
+    readqualification
 }
 
 // Teacher Features List
