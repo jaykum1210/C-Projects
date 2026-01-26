@@ -703,7 +703,10 @@ int check_student_registration_number(int reg_number)
     struct student_info stu_info;
     fp = fopen("Student_information.dat", "rb");
     if (fp == NULL)
+    {
+        fclose(fp);
         return 0; // no student file invalid
+    }
 
     while (fread(&stu_info, sizeof(stu_info), 1, fp))
     {
@@ -2830,8 +2833,120 @@ void add_teacher_information()
 
 // ========================== Add Teacher Professional Information Function Items==========================
 
-void readdesignation(char *msg,char *str, int size){
+// Check Teacher Registration Number
 
+int check_teacher_registration_number(int teach_registration)
+{
+    FILE *fp;
+    struct teacher_info teach_info;
+    fp = fopen("Teacher_information.dat", "rb");
+    if (fp == NULL)
+    {
+        fclose(fp);
+        return 0;
+    }
+
+    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    {
+        if (teach_info.teach_registration_number == teach_registration)
+        {
+            fclose(fp);
+            return 1;
+        }
+    }
+    fclose(fp);
+    return 0;
+}
+
+// Employee Type Dashboard
+
+void employee_type_dashboard(){
+    printf("1. Permanent\n");
+    printf("2. Contract\n");
+    printf("3. Visiting\n");
+}
+
+// Check Employee Type
+
+void reademploymenttype(char *msg, char *str, int size)
+{
+    int option;
+    int ch;
+
+    while (1)
+    {
+        employee_type_dashboard(); // Show employment type menu
+        printf("%s", msg);         // Prompt message
+
+        if (scanf("%d", &option) != 1)
+        {
+            printf("Invalid input! Enter numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        switch (option)
+        {
+        case 1:
+            strncpy(str, "PERMANENT", size - 1);
+            str[size - 1] = '\0';
+            return;
+
+        case 2:
+            strncpy(str, "CONTRACT", size - 1);
+            str[size - 1] = '\0';
+            return;
+
+        case 3:
+            strncpy(str, "VISITING", size - 1);
+            str[size - 1] = '\0';
+            return;
+
+        default:
+            printf("Enter Valid Option (1–3).\n");
+        }
+    }
+}
+
+// Check Reading Level - Pre-Primary, Primary, Secondary, Senior-Secondary
+
+void readteachinglevel(char *msg,char *str, int size){
+    int option = 0,ch;
+
+    // Clear Buffer
+    while((ch = getchar())!='\n' && ch!=EOF);
+
+    while (1)
+    {
+        teaching_level_dashboard();
+        printf("Enter Option : ");
+        
+        if (scanf("%d", &option) != 1)
+        {
+            printf("Invalid input! Enter numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        switch (option)
+        {
+        case 1:
+            strncpy(str, "PRE-PRIMARY",size-1);
+            str[size-1]='\0';
+            break;
+        case 2:
+            strncpy(str, "PRIMARY",size-1);
+            str[size-1] = '\0';
+            break;
+        case 3:
+            strncpy(str, "")
+        default:
+            break;
+        }
+    }
+    
 }
 
 // Add Teacher Professional Information
@@ -2865,34 +2980,68 @@ void add_teacher_professional_information()
             continue;
         }
 
-        // Clear Buffer
         while ((ch = getchar()) != '\n' && ch != EOF)
             ;
 
         if (!check_teacher_registration_number(teach_aca_info.teacher_registration_number))
         {
-            printf("Registration number not found! Please enter valid registration number\n");
+            printf("Registration number not found! Please enter valid registration number.\n");
             continue;
         }
-        valid_reg = 1; // Exit Loop
+
+        valid_reg = 1;
     }
 
-    readrequiredstring("Enter Designation : ", teach_aca_info.teacher_designation, sizeof(teach_aca_info.teacher_designation));                                             // Designation (PRT, TRT, PGT, Professor,Assistant Professor, etc.)
-    reademploymenttype("Enter Employee Type : ", teach_aca_info.teacher_employment_type, sizeof(teach_aca_info.teacher_employment_type));                                   // Permanent, Contract, Visiting
-    readhighestqualification("Enter Highest Qualification : ", teach_aca_info.teacher_highest_qualification, sizeof(teach_aca_info.teacher_highest_qualification));         
-    readspecialization("Enter Specialization : ", teach_aca_info.teacher_specialization, sizeof(teach_aca_info.teacher_specialization));
+    /* Read professional details */
+    readrequiredstring("Enter Designation : ", teach_aca_info.teacher_designation, sizeof(teach_aca_info.teacher_designation)); // PRT / TGT / PGT etc.
+
+    reademploymenttype("Enter Employee Type : ", teach_aca_info.teacher_employment_type, sizeof(teach_aca_info.teacher_employment_type)); // Permanent / Contract / Visiting
+
+    readrequiredstring("Enter Highest Qualification : ", teach_aca_info.teacher_highest_qualification, sizeof(teach_aca_info.teacher_highest_qualification)); // Highest degree
+
+    readrequiredstring("Enter Specialization : ", teach_aca_info.teacher_specialization, sizeof(teach_aca_info.teacher_specialization)); // Subject expertise
+
     printf("Enter Number of Years of Experience : ");
-    readInt(&teach_aca_info.teacher_experience_years);
+    readInt(&teach_aca_info.teacher_experience_years); // Experience in years
+
     printf("Enter Joining Year : ");
-    readInt(&teach_aca_info.teacher_joining_year);
-    readteachinglevel("Enter Teaching Level : ", teach_aca_info.teaching_level, sizeof(teach_aca_info.teaching_level));
+    readInt(&teach_aca_info.teacher_joining_year); // Year of joining
+
+    readteachinglevel("Enter Teaching Level : ", teach_aca_info.teaching_level, sizeof(teach_aca_info.teaching_level)); // Pre/Primary/Secondary/Sr.Secondary
+
+    /* Subjects handling */
     printf("Enter Number of Subjects You Want to Teach : ");
     readInt(&teach_aca_info.teacher_subject_count);
-    readsubjects_takes(teach_aca_info.teacher_subjects, teach_aca_info.teacher_subject_count);
-    readnumberclasses("Enter Number of Classes You Want to Teach : ", &teach_aca_info.teacher_preferred_class_count);
-    readclassestakes(teach_aca_info.teacher_preferred_classes, teach_aca_info.teacher_preferred_class_count);
 
-    fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, fp);
+    if (teach_aca_info.teacher_subject_count > MAX_SUBJECTS)
+    {
+        printf("Maximum %d subjects allowed.\n", MAX_SUBJECTS);
+        teach_aca_info.teacher_subject_count = MAX_SUBJECTS;
+    }
+
+    readsubjects_takes(teach_aca_info.teacher_subjects, teach_aca_info.teacher_subject_count); // Subject names
+
+    /* Class preference handling */
+    readnumberclasses("Enter Number of Classes You Want to Teach : ", &teach_aca_info.teacher_preferred_class_count);
+
+    if (teach_aca_info.teacher_preferred_class_count > MAX_CLASSES)
+    {
+        printf("Maximum %d classes allowed.\n", MAX_CLASSES);
+        teach_aca_info.teacher_preferred_class_count = MAX_CLASSES;
+    }
+
+    readclassestakes(teach_aca_info.teacher_preferred_classes, teach_aca_info.teacher_preferred_class_count); // Class numbers
+
+    /* Write data to file */
+    if (fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, fp) != 1)
+    {
+        printf("Error: Failed to store teacher academic information!\n");
+    }
+    else
+    {
+        printf("Teacher Academic Information Stored Successfully.\n");
+    }
+
     fclose(fp);
 }
 
