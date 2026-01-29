@@ -2942,6 +2942,7 @@ void readteachinglevel(char *msg,char *str, int size){
             break;
         case 3:
             strncpy(str, "SECONDARY",size-1);
+            str[size-1] = '\0';
         default:
             break;
         }
