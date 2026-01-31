@@ -2860,7 +2860,8 @@ int check_teacher_registration_number(int teach_registration)
 
 // Employee Type Dashboard
 
-void employee_type_dashboard(){
+void employee_type_dashboard()
+{
     printf("1. Permanent\n");
     printf("2. Contract\n");
     printf("3. Visiting\n");
@@ -2909,19 +2910,29 @@ void reademploymenttype(char *msg, char *str, int size)
     }
 }
 
-// Check Reading Level - Pre-Primary, Primary, Secondary, Senior-Secondary
+// Print Teacher Level Dashboard
 
-void readteachinglevel(char *msg,char *str, int size){
-    int option = 0,ch;
+void teaching_level_dashboard(){
+    printf("1. Primary\n");
+    printf("2. Secondary\n");
+    printf("3. Senior Secondary\n");
+}
+
+// Check Reading Level - Primary, Secondary, Senior-Secondary
+
+void readteachinglevel(char *msg, char *str, int size)
+{
+    int option = 0, ch;
 
     // Clear Buffer
-    while((ch = getchar())!='\n' && ch!=EOF);
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
 
     while (1)
     {
         teaching_level_dashboard();
-        printf("Enter Option : ");
-        
+        printf("%s\n",msg);
+
         if (scanf("%d", &option) != 1)
         {
             printf("Invalid input! Enter numbers only.\n");
@@ -2933,23 +2944,24 @@ void readteachinglevel(char *msg,char *str, int size){
         switch (option)
         {
         case 1:
-            strncpy(str, "PRE-PRIMARY",size-1);
-            str[size-1]='\0';
-            break;
+            strncpy(str, "PRIMARY", size - 1);
+            str[size - 1] = '\0';
+            return;
         case 2:
-            strncpy(str, "PRIMARY",size-1);
-            str[size-1] = '\0';
-            break;
+            strncpy(str, "SECONDARY", size - 1);
+            str[size - 1] = '\0';
+            return;
         case 3:
-            strncpy(str, "SECONDARY",size-1);
-            str[size-1] = '\0';
-            break;
+            strncpy(str, "SENIOR SECONDARY",size-1);
+            str[size - 1] = '\0';
+            return;
         default:
-            break;
+            printf("Choose Valid option\n");
         }
     }
-    
 }
+
+// Check Subjects Taken By the Teacher 
 
 // Add Teacher Professional Information
 
@@ -3009,7 +3021,7 @@ void add_teacher_professional_information()
     printf("Enter Joining Year : ");
     readInt(&teach_aca_info.teacher_joining_year); // Year of joining
 
-    readteachinglevel("Enter Teaching Level : ", teach_aca_info.teaching_level, sizeof(teach_aca_info.teaching_level)); // Pre/Primary/Secondary/Sr.Secondary
+    readteachinglevel("Enter Teaching Level : ", teach_aca_info.teaching_level, sizeof(teach_aca_info.teaching_level)); // Primary/Secondary/Sr.Secondary
 
     /* Subjects handling */
     printf("Enter Number of Subjects You Want to Teach : ");
@@ -3021,7 +3033,7 @@ void add_teacher_professional_information()
         teach_aca_info.teacher_subject_count = MAX_SUBJECTS;
     }
 
-    readsubjects_takes(teach_aca_info.teacher_subjects, teach_aca_info.teacher_subject_count); // Subject names
+    readsubjects_takes(teach_aca_info.teacher_subjects, teach_aca_info.teacher_subject_count,teach_aca_info.teaching_level); // Subject names
 
     /* Class preference handling */
     readnumberclasses("Enter Number of Classes You Want to Teach : ", &teach_aca_info.teacher_preferred_class_count);
