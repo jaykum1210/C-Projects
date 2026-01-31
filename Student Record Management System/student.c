@@ -2912,7 +2912,8 @@ void reademploymenttype(char *msg, char *str, int size)
 
 // Print Teacher Level Dashboard
 
-void teaching_level_dashboard(){
+void teaching_level_dashboard()
+{
     printf("1. Primary\n");
     printf("2. Secondary\n");
     printf("3. Senior Secondary\n");
@@ -2931,7 +2932,7 @@ void readteachinglevel(char *msg, char *str, int size)
     while (1)
     {
         teaching_level_dashboard();
-        printf("%s\n",msg);
+        printf("%s\n", msg);
 
         if (scanf("%d", &option) != 1)
         {
@@ -2952,7 +2953,7 @@ void readteachinglevel(char *msg, char *str, int size)
             str[size - 1] = '\0';
             return;
         case 3:
-            strncpy(str, "SENIOR SECONDARY",size-1);
+            strncpy(str, "SENIOR SECONDARY", size - 1);
             str[size - 1] = '\0';
             return;
         default:
@@ -2961,7 +2962,48 @@ void readteachinglevel(char *msg, char *str, int size)
     }
 }
 
-// Check Subjects Taken By the Teacher 
+// Check Subjects Taken By the Teacher
+
+void readsubjects_takes(char teacher_subjects[][SUBJECT_LEN], int subject_count, char *teacher_level)
+{
+    int ch, option = 0, count = 0;
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (1)
+    {
+        if (strcmp(*teacher_level, "PRIMARY") == 0)
+        {
+            primary_class_subject_dashboard();
+        }
+        else if (strcmp(*teacher_level, "SECONDARY") == 0)
+        {
+            secondary_class_subject_dashboard();
+        }
+        else
+        {
+            senior_class_subject_dashboard();
+        }
+
+        for (int i = 0; i < subject_count; i++)
+        {
+            printf("Enter Subject %d : ", i + 1);
+            readrequiredstring("", teacher_subjects[i], SUBJECT_LEN);
+            if (!valid_class_teacher(teacher_subjects[i], teacher_level))
+            {
+                printf("Invalid Subject! Please Enter Valid Subject.\n");
+                continue;
+            }
+            if (!duplicate_teacher_subject(teacher_subjects[i], i, teacher_subjects))
+            {
+                printf("Subject already selected. Choose another.\n");
+                continue;
+            }
+        }
+    }
+}
 
 // Add Teacher Professional Information
 
@@ -3033,7 +3075,7 @@ void add_teacher_professional_information()
         teach_aca_info.teacher_subject_count = MAX_SUBJECTS;
     }
 
-    readsubjects_takes(teach_aca_info.teacher_subjects, teach_aca_info.teacher_subject_count,teach_aca_info.teaching_level); // Subject names
+    readsubjects_takes(teach_aca_info.teacher_subjects, teach_aca_info.teacher_subject_count, teach_aca_info.teaching_level); // Subject names
 
     /* Class preference handling */
     readnumberclasses("Enter Number of Classes You Want to Teach : ", &teach_aca_info.teacher_preferred_class_count);
