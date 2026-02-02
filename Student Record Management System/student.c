@@ -3002,7 +3002,6 @@ void readsubjects_takes(char teacher_subjects[][SUBJECT_LEN], int subject_count,
                 continue;
             }
         }
-        
     }
 }
 
