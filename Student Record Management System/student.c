@@ -186,6 +186,17 @@ void teacher_dashboard()
     printf("14. Exit\n");
 }
 
+// Make UpperCase
+
+void touppercase(char *teacher_subjects){
+    int i = 0;
+    while (teacher_subjects[i] != '\0')
+    {
+        teacher_subjects[i] = toupper((unsigned char)teacher_subjects[i]);
+        i++;
+    }
+}
+
 // ==============================================================================
 // ============================== Student Function ==============================
 // ==============================================================================
@@ -2867,6 +2878,68 @@ void employee_type_dashboard()
     printf("3. Visiting\n");
 }
 
+// Print Teacher Level Dashboard
+void teaching_level_dashboard()
+{
+    printf("1. Primary\n");
+    printf("2. Secondary\n");
+    printf("3. Senior Secondary\n");
+}
+
+// Primary Class Subjects
+void primary_class_subject_dashboard()
+{
+    printf("1. English\n");
+    printf("2. Hindi\n");
+    printf("3. Mathematics\n");
+    printf("4. Environmental Studies\n");
+    printf("5. General Knowledge\n");
+    printf("6. Computer\n");
+}
+
+// Secondary Class Subjects
+void secondary_class_subject_dashboard()
+{
+    printf("1. English\n");
+    printf("2. Hindi\n");
+    printf("3. Sanskrit\n");
+    printf("4. Mathematics\n");
+    printf("5. Science\n");
+    printf("6. Social Science\n");
+    printf("7. Computer\n");
+}
+
+// Senior Secondary Subjets
+void senior_class_subject_dashboard()
+{
+    printf("=============== Science Stream ===============\n");
+    printf("1. English\n");
+    printf("2. Physics\n");
+    printf("3. Chemistry\n");
+    printf("4. Biology\n");
+    printf("5. Mathematics\n");
+    printf("6. Computer\n");
+    printf("7. Yoga\n");
+
+    printf("=============== Commerce Stream ===============\n");
+    printf("1. English\n");
+    printf("2. Accountancy\n");
+    printf("3. Business Studies\n");
+    printf("4. Economics\n");
+    printf("5. Applied Maths\n");
+    printf("6. Computer\n");
+    printf("7. Ypga\n");
+
+    printf("=============== Arts Stream ===============\n");
+    printf("1. English\n");
+    printf("2. History\n");
+    printf("3. Geography\n");
+    printf("4. Political Science\n");
+    printf("5. Economics\n");
+    printf("6. Sociology\n");
+    printf("7. Psychology\n");
+}
+
 // Check Employee Type
 
 void reademploymenttype(char *msg, char *str, int size)
@@ -2908,15 +2981,6 @@ void reademploymenttype(char *msg, char *str, int size)
             printf("Enter Valid Option (1–3).\n");
         }
     }
-}
-
-// Print Teacher Level Dashboard
-
-void teaching_level_dashboard()
-{
-    printf("1. Primary\n");
-    printf("2. Secondary\n");
-    printf("3. Senior Secondary\n");
 }
 
 // Check Reading Level - Primary, Secondary, Senior-Secondary
@@ -2962,6 +3026,14 @@ void readteachinglevel(char *msg, char *str, int size)
     }
 }
 
+int valid_class_teacher(char teacher_subject[],char *teacher_level){
+    if (strcmp(teacher_level,"PRIMARY")==0)
+    {
+        
+    }
+    
+}
+
 // Check Subjects Taken By the Teacher
 
 void readsubjects_takes(char teacher_subjects[][SUBJECT_LEN], int subject_count, char *teacher_level)
@@ -2972,35 +3044,40 @@ void readsubjects_takes(char teacher_subjects[][SUBJECT_LEN], int subject_count,
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
 
-    while (1)
+    if (strcmp(*teacher_level, "PRIMARY") == 0)
     {
-        if (strcmp(*teacher_level, "PRIMARY") == 0)
-        {
-            primary_class_subject_dashboard();
-        }
-        else if (strcmp(*teacher_level, "SECONDARY") == 0)
-        {
-            secondary_class_subject_dashboard();
-        }
-        else
-        {
-            senior_class_subject_dashboard();
-        }
+        primary_class_subject_dashboard();
+    }
+    else if (strcmp(*teacher_level, "SECONDARY") == 0)
+    {
+        secondary_class_subject_dashboard();
+    }
+    else
+    {
+        senior_class_subject_dashboard();
+    }
 
-        for (int i = 0; i < subject_count; i++)
+    // Enter Subject
+    for (int i = 0; i < subject_count; i++)
+    {
+        while (1)
         {
             printf("Enter Subject %d : ", i + 1);
             readrequiredstring("", teacher_subjects[i], SUBJECT_LEN);
+
             if (!valid_class_teacher(teacher_subjects[i], teacher_level))
             {
                 printf("Invalid Subject! Please Enter Valid Subject.\n");
-                continue;
+                continue; // re-enter SAME subject
             }
-            if (!duplicate_teacher_subject(teacher_subjects[i], i, teacher_subjects))
+
+            if (duplicate_teacher_subject(teacher_subjects, i, teacher_subjects[i]))
             {
                 printf("Subject already selected. Choose another.\n");
-                continue;
+                continue; // re-enter SAME subject
             }
+            touppercase(teacher_subjects[i]);
+            break; // Subject Accepted
         }
     }
 }
