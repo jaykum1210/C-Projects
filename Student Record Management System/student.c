@@ -188,11 +188,12 @@ void teacher_dashboard()
 
 // Make UpperCase
 
-void touppercase(char *teacher_subjects){
+void touppercase(char *str)
+{
     int i = 0;
-    while (teacher_subjects[i] != '\0')
+    while (str[i] != '\0')
     {
-        teacher_subjects[i] = toupper((unsigned char)teacher_subjects[i]);
+        str[i] = toupper((unsigned char)str[i]);
         i++;
     }
 }
@@ -403,10 +404,7 @@ void readcaste(char *msg, char *str, int size)
         str[strcspn(str, "\n")] = '\0';
 
         // Convert to uppercase
-        for (int i = 0; str[i] != '\0'; i++)
-        {
-            str[i] = toupper((unsigned char)str[i]);
-        }
+        touppercase(str);
 
         // Validate caste
         if (strcmp(str, "GEN") == 0 ||
@@ -994,10 +992,7 @@ void readschool(const char *msg, char *str, int size, struct student_academic_in
     } while (strlen(str) == 0);
 
     // Convert to uppercase for comparison
-    for (int i = 0; str[i] != '\0'; i++)
-    {
-        str[i] = toupper((unsigned char)str[i]);
-    }
+    touppercase(str);
 
     // If school is different, ask for address details
     if (strcmp(str, CURRENT_SCHOOL) != 0)
@@ -1033,8 +1028,7 @@ void readstream(const char *msg, char *stream, int size)
         stream[strcspn(stream, "\n")] = '\0';
 
         // convert to uppercase
-        for (int i = 0; stream[i]; i++)
-            stream[i] = toupper((unsigned char)stream[i]);
+        touppercase(stream);
 
         // validate stream
         if (strcmp(stream, "PCM") == 0 ||
@@ -1160,8 +1154,7 @@ int confirm_yes_no(const char *msg)
             ;
 
         // convert to uppercase
-        for (int i = 0; choice[i]; i++)
-            choice[i] = toupper((unsigned char)choice[i]);
+        touppercase(choice);
 
         if (strcmp(choice, "YES") == 0)
             return 1;
@@ -1251,8 +1244,7 @@ void see_student_academic_details()
                 while ((ch = getchar()) != '\n' && ch != EOF)
                     ;
 
-                for (int i = 0; choice[i]; i++)
-                    choice[i] = toupper((unsigned char)choice[i]);
+                touppercase(choice);
 
                 if (strcmp(choice, "YES") == 0)
                 {
@@ -2928,7 +2920,7 @@ void senior_class_subject_dashboard()
     printf("4. Economics\n");
     printf("5. Applied Maths\n");
     printf("6. Computer\n");
-    printf("7. Ypga\n");
+    printf("7. Yoga\n");
 
     printf("=============== Arts Stream ===============\n");
     printf("1. English\n");
@@ -3026,12 +3018,69 @@ void readteachinglevel(char *msg, char *str, int size)
     }
 }
 
-int valid_class_teacher(char teacher_subject[],char *teacher_level){
-    if (strcmp(teacher_level,"PRIMARY")==0)
+int valid_class_teacher(char teacher_subject[], char *teacher_level)
+{
+    if (strcmp(teacher_level, "PRIMARY") == 0)
     {
-        
+        if (strcmp("ENGLISH", teacher_subject) == 0 ||
+            strcmp("HINDI", teacher_subject) == 0 ||
+            strcmp("MATHEMATICS", teacher_subject) == 0 ||
+            strcmp("ENVIRONMENTAL STUDIES", teacher_subject) == 0 ||
+            strcmp("GENERAL KNOWLEDGE", teacher_subject) == 0 ||
+            strcmp("COMPUTER", teacher_subject) == 0)
+        {
+            return 1;
+        }
     }
-    
+    else if (strcmp(teacher_level, "SECONDARY") == 0)
+    {
+        if (strcmp("ENGLISH", teacher_subject) == 0 ||
+            strcmp("HINDI", teacher_subject) == 0 ||
+            strcmp("SANSKRIT", teacher_subject) == 0 ||
+            strcmp("MATHEMATICS", teacher_subject) == 0 ||
+            strcmp("SCIENCE", teacher_subject) == 0 ||
+            strcmp("SOCIAL SCIENCE", teacher_subject) == 0 ||
+            strcmp("COMPUTER", teacher_subject) == 0)
+        {
+            return 1;
+        }
+    }
+    else
+    {
+        if (strcmp("ENGLISH", teacher_subject) == 0 ||
+            strcmp("PHYSICS", teacher_subject) == 0 ||
+            strcmp("CHEMISTRY", teacher_subject) == 0 ||
+            strcmp("BIOLOGY", teacher_subject) == 0 ||
+            strcmp("MATHEMATICS", teacher_subject == 0) ||
+            strcmp("COMPUTER", teacher_subject) == 0 ||
+            strcmp("YOGA", teacher_subject) == 0 ||
+            strcmp("ACCOUNTANCY", teacher_subject) == 0 ||
+            strcmp("BUSINESS STUDIES", teacher_subject) == 0 ||
+            strcmp("ECONOMICS", teacher_subject) == 0 ||
+            strcmp("APPLIED MATHS", teacher_subject) == 0 ||
+            strcmp("HISTORY", teacher_subject) == 0 ||
+            strcmp("GEOGRAPHY", teacher_subject) == 0 ||
+            strcmp("POLITICAL SCIENCE", teacher_subject) == 0 ||
+            strcmp("SOCIOLOGY", teacher_subject) == 0 ||
+            strcmp("PSYCHOLOGY", teacher_subject) == 0)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// Check Duplicate Subjects
+
+int duplicate_teacher_subject(char subject[][SUBJECT_LEN], int count, char *teacher_subjects){
+    for (int i = 0; i < count; i++)
+    {
+        if (strcmp(teacher_subjects[i], teacher_subjects) == 0)
+        {
+            return 1; // Duplicate Found
+        }
+    }
+    return 0; // No Duplicate
 }
 
 // Check Subjects Taken By the Teacher
@@ -3052,7 +3101,7 @@ void readsubjects_takes(char teacher_subjects[][SUBJECT_LEN], int subject_count,
     {
         secondary_class_subject_dashboard();
     }
-    else
+    else if(strcmp(*teacher_level,"SENIOR SECONDARY")==0)
     {
         senior_class_subject_dashboard();
     }
@@ -3081,6 +3130,10 @@ void readsubjects_takes(char teacher_subjects[][SUBJECT_LEN], int subject_count,
         }
     }
 }
+
+// Assign Classes To Teacher With Teacher
+
+void readclassestakes(int classes[], int class_count,char *)
 
 // Add Teacher Professional Information
 
@@ -3155,7 +3208,8 @@ void add_teacher_professional_information()
     readsubjects_takes(teach_aca_info.teacher_subjects, teach_aca_info.teacher_subject_count, teach_aca_info.teaching_level); // Subject names
 
     /* Class preference handling */
-    readnumberclasses("Enter Number of Classes You Want to Teach : ", &teach_aca_info.teacher_preferred_class_count);
+    printf("Enter Number of Classes You Want to Teach : ");
+    readInt(&teach_aca_info.teacher_preferred_class_count);
 
     if (teach_aca_info.teacher_preferred_class_count > MAX_CLASSES)
     {
@@ -3163,7 +3217,7 @@ void add_teacher_professional_information()
         teach_aca_info.teacher_preferred_class_count = MAX_CLASSES;
     }
 
-    readclassestakes(teach_aca_info.teacher_preferred_classes, teach_aca_info.teacher_preferred_class_count); // Class numbers
+    readclassestakes(teach_aca_info.teacher_preferred_classes, teach_aca_info.teacher_preferred_class_count,teach_aca_info.teaching_level); // Class numbers
 
     /* Write data to file */
     if (fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, fp) != 1)
