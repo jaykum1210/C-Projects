@@ -3072,7 +3072,8 @@ int valid_class_teacher(char teacher_subject[], char *teacher_level)
 
 // Check Duplicate Subjects
 
-int duplicate_teacher_subject(char subject[][SUBJECT_LEN], int count, char *teacher_subjects){
+int duplicate_teacher_subject(char subject[][SUBJECT_LEN], int count, char *teacher_subjects)
+{
     for (int i = 0; i < count; i++)
     {
         if (strcmp(teacher_subjects[i], teacher_subjects) == 0)
@@ -3101,7 +3102,7 @@ void readsubjects_takes(char teacher_subjects[][SUBJECT_LEN], int subject_count,
     {
         secondary_class_subject_dashboard();
     }
-    else if(strcmp(*teacher_level,"SENIOR SECONDARY")==0)
+    else if (strcmp(*teacher_level, "SENIOR SECONDARY") == 0)
     {
         senior_class_subject_dashboard();
     }
@@ -3133,7 +3134,67 @@ void readsubjects_takes(char teacher_subjects[][SUBJECT_LEN], int subject_count,
 
 // Assign Classes To Teacher With Teacher
 
-void readclassestakes(int classes[], int class_count,char *)
+void readclassestakes(int classes[], int class_count, char *teaching_level)
+{
+    int ch, min = 0, max = 0, valid = 0;
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    // Check Teaching Level
+    if (strcmp(teaching_level, "PRIMARY") == 0)
+    {
+        min = 1;
+        max = 5;
+    }
+    else if (strcmp(teaching_level, "SECONDARY") == 0)
+    {
+        min = 6;
+        max = 10;
+    }
+    else if (strcmp(teaching_level, "SENIOR SECONDARY") == 0)
+    {
+        min = 11;
+        max = 12;
+    }
+    else
+    {
+        printf("Invalid Teaching Level\n");
+        return;
+    }
+
+    for (int i = 0; i < class_count; i++)
+    {
+        while (1)
+        {
+            printf("Enter Class %d (%d–%d): ", i + 1, min, max);
+            readInt(&classes[i]);
+
+            // Range validation
+            if (classes[i] < min || classes[i] > max)
+            {
+                printf("Invalid class for %s level.\n", teaching_level);
+                continue;
+            }
+
+            // Duplicate check
+            valid = 1;
+            for (int j = 0; j < i; j++)
+            {
+                if (classes[j] == classes[i])
+                {
+                    printf("Class already selected. Choose another.\n");
+                    valid = 0;
+                    break;
+                }
+            }
+
+            if (valid)
+                break;
+        }
+    }
+}
 
 // Add Teacher Professional Information
 
@@ -3217,7 +3278,7 @@ void add_teacher_professional_information()
         teach_aca_info.teacher_preferred_class_count = MAX_CLASSES;
     }
 
-    readclassestakes(teach_aca_info.teacher_preferred_classes, teach_aca_info.teacher_preferred_class_count,teach_aca_info.teaching_level); // Class numbers
+    readclassestakes(teach_aca_info.teacher_preferred_classes, teach_aca_info.teacher_preferred_class_count, teach_aca_info.teaching_level); // Class numbers
 
     /* Write data to file */
     if (fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, fp) != 1)
