@@ -2845,7 +2845,6 @@ int check_teacher_registration_number(int teach_registration)
     fp = fopen("Teacher_information.dat", "rb");
     if (fp == NULL)
     {
-        fclose(fp);
         return 0;
     }
 
@@ -3051,7 +3050,7 @@ int valid_class_teacher(char teacher_subject[], char *teacher_level)
             strcmp("PHYSICS", teacher_subject) == 0 ||
             strcmp("CHEMISTRY", teacher_subject) == 0 ||
             strcmp("BIOLOGY", teacher_subject) == 0 ||
-            strcmp("MATHEMATICS", teacher_subject == 0) ||
+            strcmp("MATHEMATICS", teacher_subject) == 0 ||
             strcmp("COMPUTER", teacher_subject) == 0 ||
             strcmp("YOGA", teacher_subject) == 0 ||
             strcmp("ACCOUNTANCY", teacher_subject) == 0 ||
@@ -3072,16 +3071,16 @@ int valid_class_teacher(char teacher_subject[], char *teacher_level)
 
 // Check Duplicate Subjects
 
-int duplicate_teacher_subject(char subject[][SUBJECT_LEN], int count, char *teacher_subjects)
+int duplicate_teacher_subject(char subjects[][SUBJECT_LEN], int count, char *new_subject)
 {
     for (int i = 0; i < count; i++)
     {
-        if (strcmp(teacher_subjects[i], teacher_subjects) == 0)
+        if (strcmp(subjects[i], new_subject) == 0)
         {
-            return 1; // Duplicate Found
+            return 1;
         }
     }
-    return 0; // No Duplicate
+    return 0;
 }
 
 // Check Subjects Taken By the Teacher
