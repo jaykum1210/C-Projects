@@ -2834,7 +2834,7 @@ void add_teacher_information()
     fclose(fp);
 }
 
-// ========================== Add Teacher Professional Information Function Items==========================
+// ========================== Add Teacher Professional Information Function Items ==========================
 
 // Check Teacher Registration Number
 
@@ -2842,7 +2842,7 @@ int check_teacher_registration_number(int teach_registration)
 {
     FILE *fp;
     struct teacher_info teach_info;
-    fp = fopen("Teacher_information.dat", "rb");
+    fp = fopen("Teacher_Academic.dat", "rb");
     if (fp == NULL)
     {
         return 0;
@@ -3087,13 +3087,13 @@ int duplicate_teacher_subject(char subjects[][SUBJECT_LEN], int count, char *new
 
 void readsubjects_takes(char teacher_subjects[][SUBJECT_LEN], int subject_count, char *teacher_level)
 {
-    int ch, option = 0, count = 0;
+    int ch;
 
     // Clear Buffer
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
 
-    if (strcmp(*teacher_level, "PRIMARY") == 0)
+    if (strcmp(teacher_level, "PRIMARY") == 0)
     {
         primary_class_subject_dashboard();
     }
@@ -3114,10 +3114,12 @@ void readsubjects_takes(char teacher_subjects[][SUBJECT_LEN], int subject_count,
             printf("Enter Subject %d : ", i + 1);
             readrequiredstring("", teacher_subjects[i], SUBJECT_LEN);
 
+            touppercase(teacher_subjects[i]);
+
             if (!valid_class_teacher(teacher_subjects[i], teacher_level))
             {
-                printf("Invalid Subject! Please Enter Valid Subject.\n");
-                continue; // re-enter SAME subject
+                printf("Invalid Subject!\n");
+                continue;
             }
 
             if (duplicate_teacher_subject(teacher_subjects, i, teacher_subjects[i]))
@@ -3248,7 +3250,10 @@ void add_teacher_professional_information()
     readrequiredstring("Enter Specialization : ", teach_aca_info.teacher_specialization, sizeof(teach_aca_info.teacher_specialization)); // Subject expertise
 
     printf("Enter Number of Years of Experience : ");
-    readInt(&teach_aca_info.teacher_experience_years); // Experience in years
+    if (teach_aca_info.teacher_experience_years < 0)
+    {
+        printf("Experience cannot be negative.\n");
+    }
 
     printf("Enter Joining Year : ");
     readInt(&teach_aca_info.teacher_joining_year); // Year of joining
@@ -3290,6 +3295,12 @@ void add_teacher_professional_information()
     }
 
     fclose(fp);
+}
+
+// ========================== Add Teacher Professional Information Function Items==========================
+
+void update_teacher_information(){
+    
 }
 
 // Teacher Features List
