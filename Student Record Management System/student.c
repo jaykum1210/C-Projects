@@ -3249,10 +3249,18 @@ void add_teacher_professional_information()
 
     readrequiredstring("Enter Specialization : ", teach_aca_info.teacher_specialization, sizeof(teach_aca_info.teacher_specialization)); // Subject expertise
 
-    printf("Enter Number of Years of Experience : ");
-    if (teach_aca_info.teacher_experience_years < 0)
+    while (1)
     {
-        printf("Experience cannot be negative.\n");
+        printf("Enter Number of Years of Experience : ");
+        readInt(&teach_aca_info.teacher_experience_years);
+
+        if (teach_aca_info.teacher_experience_years < 0)
+        {
+            printf("Experience cannot be negative.\n");
+            continue;
+        }
+
+        break; // valid input
     }
 
     printf("Enter Joining Year : ");
@@ -3297,10 +3305,1279 @@ void add_teacher_professional_information()
     fclose(fp);
 }
 
-// ========================== Add Teacher Professional Information Function Items==========================
+// ========================== Update Teacher Information Function Items==========================
 
-void update_teacher_information(){
+// Update Teacher Details Dashboard
+
+void teacher_student_update_dashboard()
+{
+    printf("1. Teacher Name\n");
+    printf("2. Email Id\n");
+    printf("3. Mobile Number\n");
+    printf("4. DOB\n");
+    printf("5. Gender\n");
+    printf("6. Caste\n");
+    printf("7. Address\n");
+
+    printf("8. Designation\n");
+    printf("9. Employee Type\n");
+    printf("10. Highest Qualification\n");
+    printf("11. Specialization\n");
+    printf("12. Experience Year\n");
+    printf("13. Joining Year\n");
+    printf("14. Teaching Level\n");
+    printf("15. Subject Count\n");
+    printf("16. Subjects\n");
+    printf("17. Preferred Class Count\n");
+    printf("18. Preferred Classes\n");
+
+    printf("0. Exit\n");
+}
+
+// Update Teacher Name
+
+void update_teacher_name(int reg_no)
+{
+    FILE *fp, *temp;
+    struct teacher_info teach_info;
+    int found = 0, ch;
+    fp = fopen("Teacher_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    {
+        if (teach_info.teach_registration_number == reg_no)
+        {
+            found = 1;
+            readrequiredstring("Enter First Name : ", teach_info.teach_firstname, sizeof(teach_info.teach_firstname));
+            readrequiredstring("Enter Middle Name : ", teach_info.teach_middlename, sizeof(teach_info.teach_middlename));
+            readrequiredstring("Enter Last Name : ", teach_info.teach_lastname, sizeof(teach_info.teach_lastname));
+        }
+        fwrite(&teach_info, sizeof(teach_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+    remove("Teacher_information.dat");
+    rename("temp.dat", "Teacher_information.dat");
+}
+
+// Update Teacher Personal Email Id
+
+void update_teacher_email(int reg_no)
+{
+    FILE *fp, *temp;
+    struct teacher_info teach_info;
+    int found = 0;
+    fp = fopen("Teacher_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+
+    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    {
+        if (teach_info.teach_registration_number == reg_no)
+        {
+            found = 1;
+            readmail("Enter Email Id : ", teach_info.teach_email, sizeof(teach_info.teach_email));
+        }
+        fwrite(&teach_info, sizeof(teach_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        return;
+    }
+    remove("Teacher_information.dat");
+    rename("temp.dat", "Teacher_information.dat");
+}
+
+// Update Teacher Mobile Number
+
+void update_teacher_mobile_number(int reg_no)
+{
+    FILE *fp, *temp;
+    struct teacher_info teach_info;
+    int found = 0, ch;
+    fp = fopen("Teacher_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        remove("temp.dat");
+        return;
+    }
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    {
+        if (teach_info.teach_registration_number == reg_no)
+        {
+            found = 1;
+            readmobilenumber("Enter Teacher Mobile Number : ", teach_info.teach_mobile_number, sizeof(teach_info.teach_mobile_number));
+        }
+        fwrite(&teach_info, sizeof(teach_info), 1, temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+    remove("Teacher_information.dat");
+    rename("temp.dat", "Teacher_information.dat");
+}
+
+// Update Teacher DOB
+
+void update_teacher_DOB(int reg_no)
+{
+    FILE *fp, *temp;
+    struct teacher_info teach_info;
+    int found = 0, ch;
+
+    fp = fopen("Teacher_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        if (temp)
+            remove("temp.dat");
+        return;
+    }
+
+    // Clear input buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    {
+        if (teach_info.teach_registration_number == reg_no)
+        {
+            found = 1;
+            readdob("Enter DOB (DD/MM/YYYY) : ", teach_info.teach_DOB, sizeof(teach_info.teach_DOB));
+        }
+        fwrite(&teach_info, sizeof(teach_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_information.dat");
+    rename("temp.dat", "Teacher_information.dat");
+}
+
+// Update Teacher Gender
+
+void update_teacher_gender(int reg_no)
+{
+    FILE *fp, *temp;
+    struct teacher_info teach_info;
+    int found = 0, ch;
+
+    fp = fopen("Teacher_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        if (temp)
+            remove("temp.dat");
+        return;
+    }
+
+    // Clear input buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    {
+        if (teach_info.teach_registration_number == reg_no)
+        {
+            found = 1;
+            readgender("Enter Gender : ", teach_info.teach_gender, sizeof(teach_info.teach_gender));
+        }
+        fwrite(&teach_info, sizeof(teach_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_information.dat");
+    rename("temp.dat", "Teacher_information.dat");
+}
+
+// Update Teacher Caste
+
+void update_teacher_caste(int reg_no)
+{
+    FILE *fp, *temp;
+    struct teacher_info teach_info;
+    int found = 0, ch;
+
+    fp = fopen("Teacher_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        if (temp)
+            remove("temp.dat");
+        return;
+    }
+
+    // Clear input buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    {
+        if (teach_info.teach_registration_number == reg_no)
+        {
+            found = 1;
+            readcaste("Enter Caste : ", teach_info.teach_caste, sizeof(teach_info.teach_caste));
+        }
+        fwrite(&teach_info, sizeof(teach_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_information.dat");
+    rename("temp.dat", "Teacher_information.dat");
+}
+
+// Update Teacher Address
+
+void update_teacher_address(int reg_no)
+{
+    FILE *fp, *temp;
+    struct teacher_info teach_info;
+    int found = 0, ch;
+
+    fp = fopen("Teacher_information.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        if (temp)
+            remove("temp.dat");
+        return;
+    }
+
+    // Clear input buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    {
+        if (teach_info.teach_registration_number == reg_no)
+        {
+            found = 1;
+
+            readrequiredstring("Enter Street Name : ", teach_info.teach_street, sizeof(teach_info.teach_street));
+
+            readrequiredstring("Enter Area : ", teach_info.teach_area, sizeof(teach_info.teach_area));
+
+            readrequiredstring("Enter City Name : ", teach_info.teach_city, sizeof(teach_info.teach_city));
+
+            readrequiredstring("Enter State : ", teach_info.teach_state, sizeof(teach_info.teach_state));
+
+            readzipcode("Enter Zipcode : ", &teach_info.teach_zipcode);
+        }
+        fwrite(&teach_info, sizeof(teach_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_information.dat");
+    rename("temp.dat", "Teacher_information.dat");
+}
+
+// Update Teacher Designation
+
+void update_teacher_designation(int reg_no)
+{
+    FILE *fp, *temp;
+    struct teacher_academic_information teach_aca_info;
+    int found = 0, ch;
+
+    fp = fopen("Teacher_Academic.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        if (temp)
+            remove("temp.dat");
+        return;
+    }
+
+    // Clear input buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp))
+    {
+        if (teach_aca_info.teacher_registration_number == reg_no)
+        {
+            found = 1;
+            readrequiredstring(
+                "Enter Designation : ", teach_aca_info.teacher_designation, sizeof(teach_aca_info.teacher_designation));
+        }
+        fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_Academic.dat");
+    rename("temp.dat", "Teacher_Academic.dat");
+}
+
+// Update Teacher Employee Type
+
+void update_teacher_employee_type(int reg_no)
+{
+    FILE *fp, *temp;
+    struct teacher_academic_information teach_aca_info;
+    int found = 0, ch;
+
+    fp = fopen("Teacher_Academic.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        if (temp)
+            remove("temp.dat");
+        return;
+    }
+
+    // Clear input buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp))
+    {
+        if (teach_aca_info.teacher_registration_number == reg_no)
+        {
+            found = 1;
+            reademploymenttype("Enter Employee Type : ", teach_aca_info.teacher_employment_type, sizeof(teach_aca_info.teacher_employment_type));
+        }
+
+        // write to temp, NOT fp
+        fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_Academic.dat");
+    rename("temp.dat", "Teacher_Academic.dat");
+}
+
+// Update Highest Qualification
+
+void update_highest_qualification(int reg_no)
+{
+    FILE *fp, *temp;
+    struct teacher_academic_information teach_aca_info;
+    int found = 0, ch;
+
+    fp = fopen("Teacher_Academic.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        if (temp)
+            remove("temp.dat");
+        return;
+    }
+
+    // Clear input buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp))
+    {
+        if (teach_aca_info.teacher_registration_number == reg_no)
+        {
+            found = 1;
+            readrequiredstring("Enter Highest Qualification : ", teach_aca_info.teacher_highest_qualification, sizeof(teach_aca_info.teacher_highest_qualification));
+        }
+
+        // ALWAYS write to temp
+        fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_Academic.dat");
+    rename("temp.dat", "Teacher_Academic.dat");
+}
+
+// Update Teacher Specialization
+
+void update_teacher_specialization(int reg_no)
+{
+    FILE *fp, *temp;
+    struct teacher_academic_information teach_aca_info;
+    int found = 0, ch;
+
+    fp = fopen("Teacher_Academic.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+        if (temp)
+            remove("temp.dat");
+        return;
+    }
+
+    // Clear input buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp))
+    {
+        if (teach_aca_info.teacher_registration_number == reg_no)
+        {
+            found = 1;
+            readrequiredstring("Enter Specialization : ", teach_aca_info.teacher_specialization, sizeof(teach_aca_info.teacher_specialization));
+        }
+        fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_Academic.dat");
+    rename("temp.dat", "Teacher_Academic.dat");
+}
+
+// Experience Year
+
+void update_experience_year(int reg_no)
+{
+    FILE *fp = NULL, *temp = NULL;
+    struct teacher_academic_information teach_aca_info;
+    int found = 0;
+
+    fp = fopen("Teacher_Academic.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+
+        if (fp != NULL)
+            fclose(fp);
+        if (temp != NULL)
+        {
+            fclose(temp);
+            remove("temp.dat");
+        }
+        return;
+    }
+
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
+    {
+        if (teach_aca_info.teacher_registration_number == reg_no)
+        {
+            found = 1;
+
+            while (1)
+            {
+                printf("Enter Number of Years of Experience : ");
+                readInt(&teach_aca_info.teacher_experience_years);
+
+                if (teach_aca_info.teacher_experience_years < 0)
+                {
+                    printf("Experience cannot be negative. Try again.\n");
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_Academic.dat");
+    rename("temp.dat", "Teacher_Academic.dat");
+}
+
+// Update Joining Year
+
+void update_joining_year(int reg_no)
+{
+    FILE *fp = NULL, *temp = NULL;
+    struct teacher_academic_information teach_aca_info;
+    int found = 0;
+
+    fp = fopen("Teacher_Academic.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+
+        if (fp)
+            fclose(fp);
+        if (temp)
+        {
+            fclose(temp);
+            remove("temp.dat");
+        }
+        return;
+    }
+
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
+    {
+        if (teach_aca_info.teacher_registration_number == reg_no)
+        {
+            found = 1;
+
+            while (1)
+            {
+                printf("Enter Joining Year : ");
+                readInt(&teach_aca_info.teacher_joining_year);
+
+                if (teach_aca_info.teacher_joining_year < 1950 ||
+                    teach_aca_info.teacher_joining_year > 2100)
+                {
+                    printf("Invalid joining year. Try again.\n");
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_Academic.dat");
+    rename("temp.dat", "Teacher_Academic.dat");
+}
+
+// Update Teacher Teaching Level
+
+void update_teaching_level(int reg_no)
+{
+    FILE *fp = NULL, *temp = NULL;
+    struct teacher_academic_information teach_aca_info;
+    int found = 0, ch;
+
+    fp = fopen("Teacher_Academic.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+
+        if (fp)
+            fclose(fp);
+        if (temp)
+        {
+            fclose(temp);
+            remove("temp.dat");
+        }
+        return;
+    }
+
+    // Clear input buffer (important if scanf was used earlier)
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
+    {
+        if (teach_aca_info.teacher_registration_number == reg_no)
+        {
+            found = 1;
+            readteachinglevel("Enter Teaching Level : ", teach_aca_info.teaching_level, sizeof(teach_aca_info.teaching_level));
+        }
+
+        // ALWAYS write to temp
+        fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_Academic.dat");
+    rename("temp.dat", "Teacher_Academic.dat");
+}
+
+// Update Teaching Subject Count
+
+void update_teacher_subject_count(int reg_no)
+{
+    FILE *fp = NULL, *temp = NULL;
+    struct teacher_academic_information teach_aca_info;
+    int found = 0;
+
+    fp = fopen("Teacher_Academic.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+
+        if (fp)
+            fclose(fp);
+        if (temp)
+        {
+            fclose(temp);
+            remove("temp.dat");
+        }
+        return;
+    }
+
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
+    {
+        if (teach_aca_info.teacher_registration_number == reg_no)
+        {
+            found = 1;
+
+            while (1)
+            {
+                printf("Enter Number of Subjects You Want to Teach : ");
+                readInt(&teach_aca_info.teacher_subject_count);
+
+                if (teach_aca_info.teacher_subject_count <= 0)
+                {
+                    printf("Subject count must be at least 1.\n");
+                }
+                else if (teach_aca_info.teacher_subject_count > MAX_SUBJECTS)
+                {
+                    printf("Maximum %d subjects allowed. Limiting to %d.\n", MAX_SUBJECTS, MAX_SUBJECTS);
+                    teach_aca_info.teacher_subject_count = MAX_SUBJECTS;
+                    break;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_Academic.dat");
+    rename("temp.dat", "Teacher_Academic.dat");
+}
+
+// Update Teacher Subject Assign
+
+void update_teacher_subject_assign(int reg_no)
+{
+    FILE *fp = NULL, *temp = NULL;
+    struct teacher_academic_information teach_aca_info;
+    int found = 0, ch;
+
+    fp = fopen("Teacher_Academic.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+
+        if (fp)
+            fclose(fp);
+        if (temp)
+        {
+            fclose(temp);
+            remove("temp.dat");
+        }
+        return;
+    }
+
+    /* Clear input buffer (safe practice) */
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
+    {
+        if (teach_aca_info.teacher_registration_number == reg_no)
+        {
+            found = 1;
+            readsubjects_takes(teach_aca_info.teacher_subjects, teach_aca_info.teacher_subject_count, teach_aca_info.teaching_level);
+        }
+
+        fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_Academic.dat");
+    rename("temp.dat", "Teacher_Academic.dat");
+}
+
+// Update Teacher Subject Count
+
+void update_teacher_preferred_class_count(int reg_no)
+{
+    FILE *fp = NULL, *temp = NULL;
+    struct teacher_academic_information teach_aca_info;
+    int found = 0;
+
+    fp = fopen("Teacher_Academic.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+
+        if (fp)
+            fclose(fp);
+        if (temp)
+        {
+            fclose(temp);
+            remove("temp.dat");
+        }
+        return;
+    }
+
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
+    {
+        if (teach_aca_info.teacher_registration_number == reg_no)
+        {
+            found = 1;
+
+            while (1)
+            {
+                printf("Enter Number of Classes You Want to Teach : ");
+                readInt(&teach_aca_info.teacher_preferred_class_count);
+
+                if (teach_aca_info.teacher_preferred_class_count <= 0)
+                {
+                    printf("Class count must be at least 1.\n");
+                }
+                else if (teach_aca_info.teacher_preferred_class_count > MAX_CLASSES)
+                {
+                    printf("Maximum %d classes allowed. Limiting to %d.\n", MAX_CLASSES, MAX_CLASSES);
+                    teach_aca_info.teacher_preferred_class_count = MAX_CLASSES;
+                    break;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_Academic.dat");
+    rename("temp.dat", "Teacher_Academic.dat");
+}
+
+// Update Preferred Class
+
+void update_preferred_class(int reg_no)
+{
+    FILE *fp = NULL, *temp = NULL;
+    struct teacher_academic_information teach_aca_info;
+    int found = 0, ch;
+
+    fp = fopen("Teacher_Academic.dat", "rb");
+    temp = fopen("temp.dat", "wb");
+
+    if (fp == NULL || temp == NULL)
+    {
+        printf("Error: File Not Open\n");
+
+        if (fp)
+            fclose(fp);
+        if (temp)
+        {
+            fclose(temp);
+            remove("temp.dat");
+        }
+        return;
+    }
+
+    /* Clear input buffer (safe practice) */
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
+    {
+        if (teach_aca_info.teacher_registration_number == reg_no)
+        {
+            found = 1;
+            readclassestakes(teach_aca_info.teacher_preferred_classes, teach_aca_info.teacher_preferred_class_count, teach_aca_info.teaching_level);
+        }
+
+        fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, temp);
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if (!found)
+    {
+        printf("Teacher Not Found\n");
+        remove("temp.dat");
+        return;
+    }
+
+    remove("Teacher_Academic.dat");
+    rename("temp.dat", "Teacher_Academic.dat");
+}
+
+// Update Teacher Information Main Function
+
+void update_teacher_information()
+{
+    int ch, update_option = 0, valid_reg = 0;
+    struct teacher_info teach_info;
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (!valid_reg)
+    {
+        printf("Enter Registration Number : ");
+
+        if (scanf("%d", &teach_info.teach_registration_number) != 1)
+        {
+            printf("Invalid input! Enter numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        // clear buffer
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
+        if (!check_teacher_registration_number(teach_info.teach_registration_number))
+        {
+            printf("Registration number not found! Please enter a valid one.\n");
+            continue;
+        }
+        valid_reg = 1; // exit loop
+    }
+
+    while (1)
+    {
+        printf("Choose Which Item You Want to Update\n");
+        teacher_student_update_dashboard();
+        printf("Enter option : ");
+
+        if (scanf("%d", &update_option) != 1)
+        {
+            printf("Invalid input! Numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        // Clear Buffer
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
+        switch (update_option)
+        {
+        case 1:
+            update_teacher_name(teach_info.teach_registration_number); // Update Teacher Name
+            break;
+        case 2:
+            update_teacher_email(teach_info.teach_registration_number); // Update Teacher Email
+            break;
+        case 3:
+            update_teacher_mobile_number(teach_info.teach_registration_number); // Update Teacher Mobile Number
+            break;
+        case 4:
+            update_teacher_DOB(teach_info.teach_registration_number); // Update Teacher DOB
+            break;
+        case 5:
+            update_teacher_gender(teach_info.teach_registration_number); // Update Teacher Gender
+            break;
+        case 6:
+            update_teacher_caste(teach_info.teach_registration_number); // Update Teacher Caste
+            break;
+        case 7:
+            update_teacher_address(teach_info.teach_registration_number); // Update Address - Street, area, city, state, zipcode
+            break;
+        case 8:
+            update_teacher_designation(teach_info.teach_registration_number); // Update Teacher Designation
+            break;
+        case 9:
+            update_teacher_employee_type(teach_info.teach_registration_number); // Update Teacher Employee Type
+            break;
+        case 10:
+            update_highest_qualification(teach_info.teach_registration_number); // Update Highest Qualification
+            break;
+        case 11:
+            update_teacher_specialization(teach_info.teach_registration_number); // Update Teacher Specialization
+            break;
+        case 12:
+            update_experience_year(teach_info.teach_registration_number); // Update Experience Year
+            break;
+        case 13:
+            update_joining_year(teach_info.teach_registration_number); // Update Joining Year
+            break;
+        case 14:
+            update_teaching_level(teach_info.teach_registration_number); // Update Teaching Level
+            break;
+        case 15:
+            update_teacher_subject_count(teach_info.teach_registration_number); // Update Teacher Subject Count
+            break;
+        case 16:
+            update_teacher_subject_assign(teach_info.teach_registration_number); // Update Teacher Subject Assign
+            break;
+        case 17:
+            update_preferred_class_count(teach_info.teach_registration_number); // Update Prederred Class Count
+            break;
+        case 18:
+            update_preferred_class(teach_info.teach_registration_number); // Update Preferred Class
+            break;
+        case 0:
+            printf("Exiting...\n"); // Exit
+            return;
+        default:
+            printf("Invalid Option\n");
+            break;
+        }
+    }
+}
+
+// ========================== View All Teacher Function Items ==========================
+
+// View All Teachers
+
+void view_all_teachers()
+{
+    FILE *fp;
+    struct teacher_info teach_info;
+
+    fp = fopen("Teacher_information.dat", "rb");
+    if (fp == NULL)
+    {
+        printf("Unable to Open File\n");
+        return;
+    }
+
+    printf("--------------------------------------------------\n");
+    printf("%-20s %-30s\n", "Registration No.", "Name");
+    printf("--------------------------------------------------\n");
+
+    while (fread(&teach_info, sizeof(teach_info), 1, fp) == 1)
+    {
+        printf("%-20d ", teach_info.teach_registration_number);
+
+        if (teach_info.teach_middlename[0] == '\0')
+        {
+            printf("%s %s\n", teach_info.teach_firstname, teach_info.teach_lastname);
+        }
+        else
+        {
+            printf("%s %s %s\n", teach_info.teach_firstname, teach_info.teach_middlename, teach_info.teach_lastname);
+        }
+    }
+    fclose(fp);
+}
+
+// ========================== View A Particular Student Under Function Items ==========================
+
+// Search Student Under Teacher Dashboard
+
+void search_student_under_dashboard()
+{
+    printf("1. Registration Number\n");
+    printf("2. Student School Email Id\n");
+    printf("3. Student Personal Email Id\n");
+    printf("4. Stdent Mobile Number\n");
+    printf("0.Exit\n");
+}
+
+// Checks for Registration Number
+
+int get_valid_student_by_registration()
+{
+    int reg_no, ch;
+
+    while (1)
+    {
+        printf("Enter Student Registration Number : ");
+
+        if (scanf("%d", &reg_no) != 1)
+        {
+            printf("Invalid input! Enter numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
+        if (!check_student_registration_number(reg_no))
+        {
+            printf("Student not found. Try again.\n");
+            continue;
+        }
+
+        return reg_no; // single exit point
+    }
+}
+
+// Checks For School Email Id
+
+int get_valid_student_by_school_email(int reg_no){
+    int ch;
+    struct student_info stu_info;
     
+}
+
+// View A Particuar Student Under
+
+void view_student_under()
+{
+    FILE *fp;
+    int ch, teacher_reg_valid = 0, option = 10;
+    struct teacher_academic_information teach_aca_info;
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    fp = fopen("Teacher_Academic.dat", "rb");
+    if (fp == NULL)
+    {
+        printf("Unable To Open File\n");
+        return;
+    }
+
+    while (!teacher_reg_valid)
+    {
+        printf("Enter Registration Number : ");
+
+        if (scanf("%d", &teach_aca_info.teacher_registration_number) != 1)
+        {
+            printf("Invalid Option! Enter Numbers Only.\n");
+
+            // Clear Buffer
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+        // Clear Buffer
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
+        if (!check_teacher_registration_number(teach_aca_info.teacher_registration_number))
+        {
+            printf("Registration number not found! Please enter valid registration number.\n");
+            continue;
+        }
+        teacher_reg_valid = 1;
+    }
+
+    while (1)
+    {
+        search_student_under_dashboard();
+        printf("Enter Option : ");
+        if (scanf("%d", &option) != 1)
+        {
+            printf("Invalid Option! Enter Numbers Only.\n");
+
+            // Clear Buffer
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        // Clear Buffer
+        while ((ch = getchar()) != '\n' && ch != EOF);
+
+        switch (option)
+        {
+        case 1:
+        {
+            int stu_reg_no = get_valid_student_by_registration();
+            search_student_under_detail(stu_reg_no);
+            break;
+        }
+        case 2:
+        {
+            int stu_reg_no = get_valid_student_by_school_email();
+            search_student_under_detail(stu_reg_no);
+            break;
+        }
+        case 3:
+        {
+            int stu_reg_no = get_valid_student_by_email();
+            search_student_under_detail(stu_reg_no);
+            break;
+        }
+        case 4:
+        {
+            int stu_reg_no = get_valid_student_by_number();
+            search_student_under_detail(stu_reg_no);
+            break;
+        }
+        case 5:
+            printf("Exiting...\n");
+            fclose(fp);
+            return;
+        default:
+            printf("Enter Valid Option\n");
+            break;
+        }
+    }
 }
 
 // Teacher Features List
@@ -3310,49 +4587,49 @@ void teacher_features(int feature_option)
     switch (feature_option)
     {
     case 1:
-        add_teacher_information();
+        add_teacher_information(); // Add Teacher Information
         break;
     case 2:
-        add_teacher_professional_information();
+        add_teacher_professional_information(); // Add Teacher Professional Infomation
         break;
     case 3:
-        update_teacher_information();
+        update_teacher_information(); // Update Teacher Information
         break;
     case 4:
-        view_all_teachers();
+        view_all_teachers(); // View All Teachers
         break;
     case 5:
-        view_student_under();
+        view_student_under(); // View A Particular Student Under Teacher
         break;
     case 6:
-        view_courses_under();
+        view_courses_under(); // View Courses Teacher Teaches
         break;
     case 7:
-        view_total_student_under();
+        view_total_student_under(); // View All Students Under
         break;
     case 8:
-        view_class_section_under();
+        view_class_section_under(); // View All Class Under
         break;
     case 9:
-        assign_new_class();
+        assign_new_class(); // Assign New Class To a Teacher
         break;
     case 10:
-        search_teacher();
+        search_teacher(); // Search Particular Teacher by - name,registration number, school Email Id
         break;
     case 11:
-        view_student_result();
+        view_student_result(); // View Particular Student Result
         break;
     case 12:
-        view_class_result();
+        view_class_result(); // View Class Result
         break;
     case 13:
-        add_result();
+        add_result(); // Add Result
         break;
     case 14:
-        printf("Exiting...\n");
+        printf("Exiting...\n"); // Exit
         break;
     default:
-        printf("Enter valid Option\n");
+        printf("Enter valid Option\n"); // Invalid option
         break;
     }
 }
