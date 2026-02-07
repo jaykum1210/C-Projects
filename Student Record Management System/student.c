@@ -67,7 +67,7 @@ struct student_academic_information
 
     int stu_subject_count;                        // Number of subject Enrolled
     char stu_subjects[MAX_SUBJECTS][SUBJECT_LEN]; // Subjects Enrolled to student
-    int stu_subject_numbers[MAX_SUBJECTS];
+    int stu_subject_numbers[MAX_SUBJECTS];        // Number of Each Subject
 
     float stu_last_percentage; // Last Year Percentage
     char stu_last_school[100]; // Last School Name
@@ -439,7 +439,7 @@ void readmail(char *msg, char *str, int size)
             return; // valid email → exit function
         }
 
-        printf("Invalid Email Address!\n");
+        printf("Invalid Email Address! Enter Valid One.\n");
     }
 }
 
@@ -4443,9 +4443,178 @@ void search_student_under_dashboard()
     printf("0.Exit\n");
 }
 
+// Print Student Detail
+
+void print_student_details(int stu_reg_no)
+{
+    FILE *fp1, *fp2;
+    int found = 0;
+
+    struct student_info stu_info;
+    struct student_academic_information stu_aca_info;
+
+    /* ---- Student Information ---- */
+    fp1 = fopen("Student_information.dat", "rb");
+    if (fp1 == NULL)
+    {
+        printf("Student Information File Not Found!\n");
+        return;
+    }
+
+    while (fread(&stu_info, sizeof(stu_info), 1, fp1) == 1)
+    {
+        if (stu_info.Stu_registration_number == stu_reg_no)
+        {
+            found = 1;
+            break;
+        }
+    }
+    fclose(fp1);
+
+    if (!found)
+    {
+        printf("Student basic information not found.\n");
+        return;
+    }
+
+    /* ---- Student Academic ---- */
+    fp2 = fopen("Student_Academic.dat", "rb");
+    if (fp2 == NULL)
+    {
+        printf("Student Academic File Not Found!\n");
+        return;
+    }
+
+    found = 0;
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp2) == 1)
+    {
+        if (stu_aca_info.stu_registration_number == stu_reg_no)
+        {
+            found = 1;
+            break;
+        }
+    }
+    fclose(fp2);
+
+    if (!found)
+    {
+        printf("Student academic information not found.\n");
+        return;
+    }
+
+    /* ---- Print Details ---- */
+    printf("\n----------------- Student Detail -----------------\n");
+    printf("Registration Number : %d\n", stu_info.Stu_registration_number);
+
+    if (strlen(stu_info.stu_middlename) == 0){
+        printf("Name                : %s %s\n",stu_info.stu_firstname, stu_info.stu_lastname);
+    }
+    else{
+        printf("Name                : %s %s %s\n",stu_info.stu_firstname,stu_info.stu_middlename,stu_info.stu_lastname);
+    }
+
+    printf("Class               : %d\n", stu_aca_info.stu_class);
+
+    printf("Section             : %c\n",stu_aca_info.stu_section);
+
+    if (stu_aca_info.stu_class > 10){
+        printf("Stream              : %s\n", stu_aca_info.stream);
+    }
+
+    printf("Subjects             : ");
+    for (int i = 0; i < stu_aca_info.stu_subject_count; i++){
+        printf("%s%s",stu_aca_info.stu_subjects[i],(i == stu_aca_info.stu_subject_count - 1) ? "\n" : ", ");
+    }
+}
+
+// Check Student Under Teacher
+
+int check_student_under_teacher(int stu_reg_no, int teach_reg_no)
+{
+    FILE *fp_stu, *fp_teach;
+    int class_found = 0;
+
+    struct student_academic_information stu_aca_info;
+    struct teacher_academic_information teach_aca_info;
+
+    // Open Student Academic File
+    fp_stu = fopen("Student_Academic.dat", "rb");
+    if (fp_stu == NULL)
+    {
+        return 0;
+    }
+
+    int student_found = 0;
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp_stu) == 1)
+    {
+        if (stu_aca_info.stu_registration_number == stu_reg_no)
+        {
+            student_found = 1;
+            break;
+        }
+    }
+    fclose(fp_stu);
+
+    if (!student_found)
+    {
+        return 0;
+    }
+
+    // Open Teacher Academic File
+    fp_teach = fopen("Teacher_Academic.dat", "rb");
+    if (fp_teach == NULL)
+    {
+        return 0;
+    }
+
+    int teacher_found = 0;
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp_teach) == 1)
+    {
+        if (teach_aca_info.teacher_registration_number == teach_reg_no)
+        {
+            teacher_found = 1;
+            break;
+        }
+    }
+    fclose(fp_teach);
+
+    if (!teacher_found)
+    {
+        return 0;
+    }
+
+    // Check Class
+    for (int i = 0; i < teach_aca_info.teacher_preferred_class_count; i++)
+    {
+        if (stu_aca_info.stu_class == teach_aca_info.teacher_preferred_classes[i])
+        {
+            class_found = 1;
+            break;
+        }
+    }
+
+    if (!class_found)
+    {
+        return 0;
+    }
+
+    // Checck Subject
+    for (int i = 0; i < teach_aca_info.teacher_subject_count; i++)
+    {
+        for (int j = 0; j < stu_aca_info.stu_subject_count; j++)
+        {
+            if (strcmp(stu_aca_info.stu_subjects[j], teach_aca_info.teacher_subjects[i]) == 0)
+            {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 // Checks for Registration Number
 
-int get_valid_student_by_registration()
+void get_valid_student_by_registration(int teacher_reg_no)
 {
     int reg_no, ch;
 
@@ -4464,21 +4633,66 @@ int get_valid_student_by_registration()
         while ((ch = getchar()) != '\n' && ch != EOF)
             ;
 
+        // Check Student Found or Not
         if (!check_student_registration_number(reg_no))
         {
             printf("Student not found. Try again.\n");
             continue;
         }
 
-        return reg_no; // single exit point
+        // Check Student Under Teacher
+        if (!check_student_under_teacher(reg_no, teacher_reg_no))
+        {
+            printf("Student is NOT under this teacher.\n");
+            continue;
+        }
+
+        // Print Student  Details If Under Teacher
+        print_student_details(reg_no);
+        return;
     }
 }
 
 // Checks For School Email Id
 
-int get_valid_student_by_school_email(int reg_no){
-    int ch;
+void get_valid_student_by_school_email(int teacher_reg_no){
+    FILE *fp;
+    char stu_school_email[100];
     struct student_info stu_info;
+    int found = 0;
+
+    fp = fopen("Student_information.dat","rb");
+    if (fp == NULL)
+    {
+        printf("File Not Found\n");
+        return;
+    }
+
+    while (1)
+    {
+        printf("Enter School Email Id : ");
+
+        fgets(stu_school_email,sizeof(stu_school_email),stdin);
+
+        // Remove Newline
+        stu_school_email[strcspn(stu_school_email,"\n")] == '\0';
+        
+        while (fread(&stu_info,sizeof(stu_info),1,fp))
+        {
+            if (strcmp(stu_info.Stu_School_email,stu_school_email))
+            {
+                found = 1;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            printf("Student Email Not Found\n");
+            return;
+        }
+        
+    }
     
 }
 
@@ -4541,32 +4755,29 @@ void view_student_under()
         }
 
         // Clear Buffer
-        while ((ch = getchar()) != '\n' && ch != EOF);
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
 
         switch (option)
         {
         case 1:
         {
-            int stu_reg_no = get_valid_student_by_registration();
-            search_student_under_detail(stu_reg_no);
+            get_valid_student_by_registration(teach_aca_info.teacher_registration_number);
             break;
         }
         case 2:
         {
-            int stu_reg_no = get_valid_student_by_school_email();
-            search_student_under_detail(stu_reg_no);
+            get_valid_student_by_school_email(teach_aca_info.teacher_registration_number);
             break;
         }
         case 3:
         {
-            int stu_reg_no = get_valid_student_by_email();
-            search_student_under_detail(stu_reg_no);
+            get_valid_student_by_email(teach_aca_info.teacher_registration_number);
             break;
         }
         case 4:
         {
-            int stu_reg_no = get_valid_student_by_number();
-            search_student_under_detail(stu_reg_no);
+            get_valid_student_by_number(teach_aca_info.teacher_registration_number);
             break;
         }
         case 5:
