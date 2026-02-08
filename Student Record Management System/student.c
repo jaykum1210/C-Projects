@@ -717,7 +717,7 @@ int check_student_registration_number(int reg_number)
         return 0; // no student file invalid
     }
 
-    while (fread(&stu_info, sizeof(stu_info), 1, fp))
+    while (fread(&stu_info, sizeof(stu_info), 1, fp) == 0)
     {
         if (stu_info.Stu_registration_number == reg_number)
         {
@@ -742,7 +742,7 @@ int is_split_needed(int stu_class)
     if (!fp)
         return 0;
 
-    while (fread(&st, sizeof(st), 1, fp))
+    while (fread(&st, sizeof(st), 1, fp) == 1)
     {
         if (st.stu_class == stu_class && st.stu_section == 'A')
             countA++;
@@ -791,36 +791,40 @@ char auto_generate_section(int stu_class)
     FILE *fp;
     struct student_academic_information st;
     int section_count[26] = {0};
-    char max_section = 'A';
+    char max_section = 0;
 
     fp = fopen("Student_academic.dat", "rb");
     if (fp == NULL)
-        return 'A'; // first student of this class
+        return 'A';
 
-    while (fread(&st, sizeof(st), 1, fp))
+    while (fread(&st, sizeof(st), 1, fp) == 1)
     {
-        if (st.stu_class == stu_class)
+        if (st.stu_class == stu_class &&
+            st.stu_section >= 'A' && st.stu_section <= 'Z')
         {
             int idx = st.stu_section - 'A';
             section_count[idx]++;
 
-            if (st.stu_section > max_section)
+            if (max_section == 0 || st.stu_section > max_section)
                 max_section = st.stu_section;
         }
     }
     fclose(fp);
 
-    /* Find first section with available space */
+    if (max_section == 0)
+        return 'A';
+
     for (int i = 0; i <= max_section - 'A'; i++)
     {
         int limit = (i == 0) ? MAX_BEFORE_DIVIDE : MAX_AFTER_DIVIDE;
-
         if (section_count[i] < limit)
             return 'A' + i;
     }
 
-    /* All existing sections are full → create new section */
-    return max_section + 1;
+    if (max_section < 'Z')
+        return max_section + 1;
+
+    return 'Z'; // fallback
 }
 
 // Split Section
@@ -840,7 +844,7 @@ void split_section(int stu_class, char section)
         return;
     }
 
-    while (fread(&st, sizeof(st), 1, fp))
+    while (fread(&st, sizeof(st), 1, fp) == 1)
     {
         if (st.stu_class == stu_class && st.stu_section == section)
         {
@@ -1174,7 +1178,7 @@ student_information_by_registration(int reg_no, struct student_info *st_info)
     if (fp == NULL)
         return 0;
 
-    while (fread(st_info, sizeof(*st_info), 1, fp))
+    while (fread(st_info, sizeof(*st_info), 1, fp) == 1)
     {
         if (st_info->Stu_registration_number == reg_no)
         {
@@ -1195,7 +1199,7 @@ student_academic_by_registration(int reg_no, struct student_academic_information
     if (fp == NULL)
         return 0;
 
-    while (fread(stu_aca_info, sizeof(*stu_aca_info), 1, fp))
+    while (fread(stu_aca_info, sizeof(*stu_aca_info), 1, fp) == 1)
     {
         if (stu_aca_info->stu_registration_number == reg_no)
         {
@@ -1351,7 +1355,7 @@ void update_student_name(int reg_no)
         return;
     }
 
-    while (fread(&st_info, sizeof(st_info), 1, fp))
+    while (fread(&st_info, sizeof(st_info), 1, fp) == 1)
     {
         if (st_info.Stu_registration_number == reg_no)
         {
@@ -1388,7 +1392,7 @@ void update_father_name(int reg_no)
         remove("temp.dat");
         return;
     }
-    while (fread(&st_info, sizeof(st_info), 1, fp))
+    while (fread(&st_info, sizeof(st_info), 1, fp) == 1)
     {
         if (st_info.Stu_registration_number == reg_no)
         {
@@ -1423,7 +1427,7 @@ void update_mother_name(int reg_no)
         remove("temp.dat");
         return;
     }
-    while (fread(&st_info, sizeof(st_info), 1, fp))
+    while (fread(&st_info, sizeof(st_info), 1, fp) == 1)
     {
         if (st_info.Stu_registration_number == reg_no)
         {
@@ -1456,7 +1460,7 @@ void update_father_occupation(int reg_no)
         remove("temp.dat");
         return;
     }
-    while (fread(&st_info, sizeof(st_info), 1, fp))
+    while (fread(&st_info, sizeof(st_info), 1, fp) == 1)
     {
         if (st_info.Stu_registration_number == reg_no)
         {
@@ -1491,7 +1495,7 @@ void update_mother_occupation(int reg_no)
         remove("temp.dat");
         return;
     }
-    while (fread(&st_info, sizeof(st_info), 1, fp))
+    while (fread(&st_info, sizeof(st_info), 1, fp) == 1)
     {
         if (st_info.Stu_registration_number == reg_no)
         {
@@ -1526,7 +1530,7 @@ void update_dob(int reg_no)
         remove("temp.dat");
         return;
     }
-    while (fread(&st_info, sizeof(st_info), 1, fp))
+    while (fread(&st_info, sizeof(st_info), 1, fp) == 1)
     {
         if (st_info.Stu_registration_number == reg_no)
         {
@@ -1561,7 +1565,7 @@ void update_gender(int reg_no)
         remove("temp.dat");
         return;
     }
-    while (fread(&st_info, sizeof(st_info), 1, fp))
+    while (fread(&st_info, sizeof(st_info), 1, fp) == 1)
     {
         if (st_info.Stu_registration_number == reg_no)
         {
@@ -1596,7 +1600,7 @@ void update_caste(int reg_no)
         remove("temp.dat");
         return;
     }
-    while (fread(&st_info, sizeof(st_info), 1, fp))
+    while (fread(&st_info, sizeof(st_info), 1, fp) == 1)
     {
         if (st_info.Stu_registration_number == reg_no)
         {
@@ -1631,7 +1635,7 @@ void update_student_email(int reg_no)
         remove("temp.dat");
         return;
     }
-    while (fread(&st_info, sizeof(st_info), 1, fp))
+    while (fread(&st_info, sizeof(st_info), 1, fp) == 1)
     {
         if (st_info.Stu_registration_number == reg_no)
         {
@@ -1666,7 +1670,7 @@ void update_student_mobile_number(int reg_no)
         remove("temp.dat");
         return;
     }
-    while (fread(&st_info, sizeof(st_info), 1, fp))
+    while (fread(&st_info, sizeof(st_info), 1, fp) == 1)
     {
         if (st_info.Stu_registration_number == reg_no)
         {
@@ -1701,7 +1705,7 @@ void update_father_mobile_number(int reg_no)
         remove("temp.dat");
         return;
     }
-    while (fread(&st_info, sizeof(st_info), 1, fp))
+    while (fread(&st_info, sizeof(st_info), 1, fp) == 1)
     {
         if (st_info.Stu_registration_number == reg_no)
         {
@@ -1736,7 +1740,7 @@ void update_address(int reg_no)
         remove("temp.dat");
         return;
     }
-    while (fread(&st_info, sizeof(st_info), 1, fp))
+    while (fread(&st_info, sizeof(st_info), 1, fp) == 1)
     {
         if (st_info.Stu_registration_number == reg_no)
         {
@@ -1896,7 +1900,7 @@ void print_student_by_registration(int reg_no)
         return;
     }
 
-    while (fread(&stu_info, sizeof(stu_info), 1, fp))
+    while (fread(&stu_info, sizeof(stu_info), 1, fp) == 1)
     {
         if (stu_info.Stu_registration_number == reg_no)
         {
@@ -1934,7 +1938,7 @@ void view_student_by_class_section(int stu_class, char stu_section, char *stream
            "Registration No.", "First Name", "Middle Name", "Last Name");
     printf("--------------------------------------------------\n");
 
-    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp))
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp) == 1)
     {
         if (stu_aca_info.stu_class == stu_class &&
             stu_aca_info.stu_section == stu_section &&
@@ -2050,7 +2054,7 @@ void get_subject_by_registration(int stu_reg)
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
 
-    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp))
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp) == 1)
     {
         if (stu_aca_info.stu_registration_number == stu_reg)
         {
@@ -2128,7 +2132,7 @@ void print_all_information(int reg_number)
         return;
     }
 
-    while (fread(&stu_info, sizeof(stu_info), 1, fp1))
+    while (fread(&stu_info, sizeof(stu_info), 1, fp1) == 1)
     {
         if (reg_number == stu_info.Stu_registration_number)
         {
@@ -2159,7 +2163,7 @@ void print_all_information(int reg_number)
         }
     }
 
-    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp2))
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp2) == 1)
     {
         if (reg_number == stu_aca_info.stu_registration_number)
         {
@@ -2219,7 +2223,7 @@ void search_student_by_name()
     readoptionalstring("Enter Middle Name : ", stu_middle_name, sizeof(stu_middle_name));
     readrequiredstring("Enter Last Name : ", stu_last_name, sizeof(stu_last_name));
 
-    while (fread(&stu_info, sizeof(stu_info), 1, fp))
+    while (fread(&stu_info, sizeof(stu_info), 1, fp) == 1)
     {
         if (strcmp(stu_first_name, stu_info.stu_firstname) == 0 && (strlen(stu_middle_name) == 0 || strcmp(stu_middle_name, stu_info.stu_middlename) == 0) && strcmp(stu_last_name, stu_info.stu_lastname) == 0)
         {
@@ -2275,7 +2279,7 @@ void search_student_by_student_email()
     // Check Email Id
     readmail("Enter Student Email Id : ", student_email_id, sizeof(student_email_id));
 
-    while (fread(&stu_info, sizeof(stu_info), 1, fp))
+    while (fread(&stu_info, sizeof(stu_info), 1, fp) == 1)
     {
         if (strcmp(student_email_id, stu_info.stu_email) == 0)
         {
@@ -2314,7 +2318,7 @@ void search_student_by_school_email()
     // Check Email Id
     readmail("Enter School Email Id : ", school_email_id, sizeof(school_email_id));
 
-    while (fread(&stu_info, sizeof(stu_info), 1, fp))
+    while (fread(&stu_info, sizeof(stu_info), 1, fp) == 1)
     {
         if (strcmp(school_email_id, stu_info.Stu_School_email) == 0)
         {
@@ -2353,7 +2357,7 @@ void search_student_by_mobile()
     // Check Mobile Number
     readmobilenumber("Enter Student Number : ", student_number, sizeof(student_number));
 
-    while (fread(&stu_info, sizeof(stu_info), 1, fp))
+    while (fread(&stu_info, sizeof(stu_info), 1, fp) == 1)
     {
         if (strcmp(student_number, stu_info.stu_mobile_number) == 0)
         {
@@ -2440,7 +2444,7 @@ void print_student_result()
         return;
     }
 
-    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp))
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp) == 1)
     {
         if (LAST_FOUND_REGISTRATION == stu_aca_info.stu_registration_number)
         {
@@ -2491,7 +2495,7 @@ int student_number_class(int stu_class)
     }
 
     // Count Number of Students
-    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp))
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp) == 1)
     {
         if (stu_class == stu_aca_info.stu_class)
         {
@@ -2519,7 +2523,7 @@ int student_number_section(int stu_class, char stu_section)
     }
 
     // Count Number of Students
-    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp))
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp) == 1)
     {
         if (stu_class == stu_aca_info.stu_class && stu_section == stu_aca_info.stu_section)
         {
@@ -2542,7 +2546,7 @@ int total_number_student()
     if (!fp)
         return 0;
 
-    while (fread(&stu_info, sizeof(stu_info), 1, fp))
+    while (fread(&stu_info, sizeof(stu_info), 1, fp) == 1)
         count++;
 
     fclose(fp);
@@ -2598,7 +2602,7 @@ int delete_student_information(int stu_reg)
         return 0;
     }
 
-    while (fread(&stu_info, sizeof(stu_info), 1, fp))
+    while (fread(&stu_info, sizeof(stu_info), 1, fp) == 1)
     {
         if (stu_reg == stu_info.Stu_registration_number)
         {
@@ -2633,7 +2637,7 @@ void delete_student_academic_info(int stu_reg)
         return;
     }
 
-    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp))
+    while (fread(&stu_aca_info, sizeof(stu_aca_info), 1, fp) == 1)
     {
         if (stu_reg == stu_aca_info.stu_registration_number)
         {
@@ -2848,7 +2852,7 @@ int check_teacher_registration_number(int teach_registration)
         return 0;
     }
 
-    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    while (fread(&teach_info, sizeof(teach_info), 1, fp) == 1)
     {
         if (teach_info.teach_registration_number == teach_registration)
         {
@@ -3355,7 +3359,7 @@ void update_teacher_name(int reg_no)
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
 
-    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    while (fread(&teach_info, sizeof(teach_info), 1, fp) == 1)
     {
         if (teach_info.teach_registration_number == reg_no)
         {
@@ -3394,7 +3398,7 @@ void update_teacher_email(int reg_no)
         return;
     }
 
-    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    while (fread(&teach_info, sizeof(teach_info), 1, fp) == 1)
     {
         if (teach_info.teach_registration_number == reg_no)
         {
@@ -3434,7 +3438,7 @@ void update_teacher_mobile_number(int reg_no)
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
 
-    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    while (fread(&teach_info, sizeof(teach_info), 1, fp) == 1)
     {
         if (teach_info.teach_registration_number == reg_no)
         {
@@ -3478,7 +3482,7 @@ void update_teacher_DOB(int reg_no)
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
 
-    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    while (fread(&teach_info, sizeof(teach_info), 1, fp) == 1)
     {
         if (teach_info.teach_registration_number == reg_no)
         {
@@ -3525,7 +3529,7 @@ void update_teacher_gender(int reg_no)
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
 
-    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    while (fread(&teach_info, sizeof(teach_info), 1, fp) == 1)
     {
         if (teach_info.teach_registration_number == reg_no)
         {
@@ -3572,7 +3576,7 @@ void update_teacher_caste(int reg_no)
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
 
-    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    while (fread(&teach_info, sizeof(teach_info), 1, fp) == 1)
     {
         if (teach_info.teach_registration_number == reg_no)
         {
@@ -3619,7 +3623,7 @@ void update_teacher_address(int reg_no)
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
 
-    while (fread(&teach_info, sizeof(teach_info), 1, fp))
+    while (fread(&teach_info, sizeof(teach_info), 1, fp) == 1)
     {
         if (teach_info.teach_registration_number == reg_no)
         {
@@ -3675,7 +3679,7 @@ void update_teacher_designation(int reg_no)
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
 
-    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp))
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
     {
         if (teach_aca_info.teacher_registration_number == reg_no)
         {
@@ -3723,7 +3727,7 @@ void update_teacher_employee_type(int reg_no)
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
 
-    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp))
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
     {
         if (teach_aca_info.teacher_registration_number == reg_no)
         {
@@ -3772,7 +3776,7 @@ void update_highest_qualification(int reg_no)
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
 
-    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp))
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
     {
         if (teach_aca_info.teacher_registration_number == reg_no)
         {
@@ -3821,7 +3825,7 @@ void update_teacher_specialization(int reg_no)
     while ((ch = getchar()) != '\n' && ch != EOF)
         ;
 
-    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp))
+    while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
     {
         if (teach_aca_info.teacher_registration_number == reg_no)
         {
@@ -4506,24 +4510,28 @@ void print_student_details(int stu_reg_no)
     printf("\n----------------- Student Detail -----------------\n");
     printf("Registration Number : %d\n", stu_info.Stu_registration_number);
 
-    if (strlen(stu_info.stu_middlename) == 0){
-        printf("Name                : %s %s\n",stu_info.stu_firstname, stu_info.stu_lastname);
+    if (strlen(stu_info.stu_middlename) == 0)
+    {
+        printf("Name                : %s %s\n", stu_info.stu_firstname, stu_info.stu_lastname);
     }
-    else{
-        printf("Name                : %s %s %s\n",stu_info.stu_firstname,stu_info.stu_middlename,stu_info.stu_lastname);
+    else
+    {
+        printf("Name                : %s %s %s\n", stu_info.stu_firstname, stu_info.stu_middlename, stu_info.stu_lastname);
     }
 
     printf("Class               : %d\n", stu_aca_info.stu_class);
 
-    printf("Section             : %c\n",stu_aca_info.stu_section);
+    printf("Section             : %c\n", stu_aca_info.stu_section);
 
-    if (stu_aca_info.stu_class > 10){
+    if (stu_aca_info.stu_class > 10)
+    {
         printf("Stream              : %s\n", stu_aca_info.stream);
     }
 
     printf("Subjects             : ");
-    for (int i = 0; i < stu_aca_info.stu_subject_count; i++){
-        printf("%s%s",stu_aca_info.stu_subjects[i],(i == stu_aca_info.stu_subject_count - 1) ? "\n" : ", ");
+    for (int i = 0; i < stu_aca_info.stu_subject_count; i++)
+    {
+        printf("%s%s", stu_aca_info.stu_subjects[i], (i == stu_aca_info.stu_subject_count - 1) ? "\n" : ", ");
     }
 }
 
@@ -4655,13 +4663,14 @@ void get_valid_student_by_registration(int teacher_reg_no)
 
 // Checks For School Email Id
 
-void get_valid_student_by_school_email(int teacher_reg_no){
+void get_valid_student_by_school_email(int teacher_reg_no)
+{
     FILE *fp;
     char stu_school_email[100];
     struct student_info stu_info;
-    int found = 0;
+    int found = 0, ch;
 
-    fp = fopen("Student_information.dat","rb");
+    fp = fopen("Student_information.dat", "rb");
     if (fp == NULL)
     {
         printf("File Not Found\n");
@@ -4670,16 +4679,25 @@ void get_valid_student_by_school_email(int teacher_reg_no){
 
     while (1)
     {
+        found = 0;
+
+        // Clear Buffer
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
         printf("Enter School Email Id : ");
 
-        fgets(stu_school_email,sizeof(stu_school_email),stdin);
+        fgets(stu_school_email, sizeof(stu_school_email), stdin);
 
         // Remove Newline
-        stu_school_email[strcspn(stu_school_email,"\n")] == '\0';
-        
-        while (fread(&stu_info,sizeof(stu_info),1,fp))
+        stu_school_email[strcspn(stu_school_email, "\n")] = '\0';
+
+        // Reset File Pointer
+        rewind(fp);
+
+        while (fread(&stu_info, sizeof(stu_info), 1, fp) == 1)
         {
-            if (strcmp(stu_info.Stu_School_email,stu_school_email))
+            if (strcmp(stu_info.Stu_School_email, stu_school_email) == 0)
             {
                 found = 1;
                 break;
@@ -4691,8 +4709,87 @@ void get_valid_student_by_school_email(int teacher_reg_no){
             printf("Student Email Not Found\n");
             return;
         }
-        
+
+        // Check Student Under Teacher
+        if (!check_student_under_teacher(stu_info.Stu_registration_number, teacher_reg_no))
+        {
+            printf("Student is NOT under this teacher.\n");
+            continue;
+        }
+
+        // Print Student  Details If Under Teacher
+        print_student_details(stu_info.Stu_registration_number);
+        fclose(fp);
+        return;
     }
+}
+
+// Check For Student Personal Email Id
+
+void get_valid_student_by_email(int teacher_reg_no)
+{
+    FILE *fp;
+    char stu_email[100];
+    struct student_info stu_info;
+    int found = 0, ch;
+
+    fp = fopen("Student_information.dat", "rb");
+    if (fp == NULL)
+    {
+        printf("File Not Found\n");
+        return;
+    }
+
+    while (1)
+    {
+        found = 0;
+
+        // Clear Buffer
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
+        printf("Enter Student Email Id : ");
+
+        fgets(stu_email, sizeof(stu_email), stdin);
+
+        // Remove NewLine
+        stu_email[strcspn(stu_email, "\n")] = '\0';
+
+        // Reset File Pointer
+        rewind(fp);
+
+        while (fread(&stu_info, sizeof(stu_info), 1, fp) == 1)
+        {
+            if (strcmp(stu_info.stu_email, stu_email) == 0)
+            {
+                found = 1;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            printf("Student Email Not Found\n");
+            return;
+        }
+
+        // Check Student Under Teacher
+        if (!check_student_under_teacher(stu_info.Stu_registration_number, teacher_reg_no))
+        {
+            printf("Student is NOT under this teacher.\n");
+            continue;
+        }
+
+        // Print Student  Details If Under Teacher
+        print_student_details(stu_info.Stu_registration_number);
+        fclose(fp);
+        return;
+    }
+}
+
+// Check Student By Mobile Number
+
+void get_valid_student_by_number(int teacher_reg_no){
     
 }
 
