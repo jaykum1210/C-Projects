@@ -874,6 +874,33 @@ void split_section(int stu_class, char section)
     rename("temp_academic.dat", "Student_academic.dat");
 }
 
+// Check Section Valid For Class
+int is_section_valid_for_class(int stu_class, char stu_section)
+{
+    FILE *fp;
+    struct student_academic_information st;
+
+    fp = fopen("Student_academic.dat", "rb");
+    if (fp == NULL)
+    {
+        return 0; // no academic file → section not valid
+    }
+
+    while (fread(&st, sizeof(st), 1, fp) == 1)
+    {
+        if (st.stu_class == stu_class &&
+            st.stu_section == stu_section)
+        {
+            fclose(fp);
+            return 1; // section exists
+        }
+    }
+
+    fclose(fp);
+    return 0; // section not found
+}
+
+
 // Check Section
 
 void readsection(const char *msg, int stu_class, char *stu_section)
@@ -2561,7 +2588,7 @@ void search_student_by_mobile()
 
 // Search Student By Information
 
-void serach_by_items_list()
+void search_by_items_list()
 {
     printf("1. Student Name\n");
     printf("2. Registration Number\n");
