@@ -5759,6 +5759,7 @@ void search_teacher()
             break;
         }
     }
+    return;
 }
 
 // ========================== View Student Result Function Items ==========================
@@ -5813,6 +5814,7 @@ void show_student_result(int stu_reg_no)
         printf("Status     : Pass\n");
     else
         printf("Status     : Fail\n");
+    return;
 }
 
 // Student Result
@@ -5913,6 +5915,7 @@ void view_student_result_under()
             printf("Enter Valid Option\n");
         }
     }
+    return;
 }
 
 // ========================== Add Student Result Function Items ==========================
@@ -5979,6 +5982,7 @@ void add_student_result(int reg_no)
 
     fclose(fp);
     printf("Student result added successfully!\n");
+    return;
 }
 
 // Add Result
@@ -6085,6 +6089,7 @@ void teacher_features(int feature_option)
         printf("Enter valid Option\n"); // Invalid option
         break;
     }
+    return;
 }
 
 // ==============================================================================
@@ -6100,6 +6105,7 @@ void parent_dashboard()
     printf("3. Update Details\n");
     printf("4. Remove Student\n");
     printf("5. Exit\n");
+    return;
 }
 
 // Student Whole Result
@@ -6161,6 +6167,7 @@ void parent_features(int option)
         printf("Enter Valid Option!\n");
         break;
     }
+    return;
 }
 
 // ========================== Main Function ==========================
@@ -6242,4 +6249,5 @@ int main()
             break;
         }
     }
+    return 0;
 }
