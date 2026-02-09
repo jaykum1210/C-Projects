@@ -2115,7 +2115,7 @@ void view_courses()
 
 // Print Student All Information
 
-void print_all_information(int reg_number)
+void print_student_all_information(int reg_number)
 {
     FILE *fp1, *fp2;
     struct student_info stu_info;
@@ -2228,7 +2228,7 @@ void search_student_by_name()
         if (strcmp(stu_first_name, stu_info.stu_firstname) == 0 && (strlen(stu_middle_name) == 0 || strcmp(stu_middle_name, stu_info.stu_middlename) == 0) && strcmp(stu_last_name, stu_info.stu_lastname) == 0)
         {
             found = 1;
-            print_all_information(stu_info.Stu_registration_number);
+            print_student_all_information(stu_info.Stu_registration_number);
         }
     }
     fclose(fp);
@@ -2236,6 +2236,7 @@ void search_student_by_name()
     {
         printf("Student Not Found\n");
     }
+    return;
 }
 
 // Serach Student By Registration Number
@@ -2248,7 +2249,7 @@ void search_student_by_registration()
     scanf("%d", &reg_number);
     if (check_student_registration_number(reg_number))
     {
-        print_all_information(reg_number);
+        print_student_all_information(reg_number);
     }
     else
     {
@@ -2284,7 +2285,7 @@ void search_student_by_student_email()
         if (strcmp(student_email_id, stu_info.stu_email) == 0)
         {
             found = 1;
-            print_all_information(stu_info.Stu_registration_number);
+            print_student_all_information(stu_info.Stu_registration_number);
             break;
         }
     }
@@ -2323,7 +2324,7 @@ void search_student_by_school_email()
         if (strcmp(school_email_id, stu_info.Stu_School_email) == 0)
         {
             found = 1;
-            print_all_information(stu_info.Stu_registration_number);
+            print_student_all_information(stu_info.Stu_registration_number);
             break;
         }
     }
@@ -2362,7 +2363,7 @@ void search_student_by_mobile()
         if (strcmp(student_number, stu_info.stu_mobile_number) == 0)
         {
             found = 1;
-            print_all_information(stu_info.Stu_registration_number);
+            print_student_all_information(stu_info.Stu_registration_number);
             break;
         }
     }
@@ -4507,7 +4508,6 @@ void print_student_details(int stu_reg_no)
     }
 
     /* ---- Print Details ---- */
-    printf("\n----------------- Student Detail -----------------\n");
     printf("Registration Number : %d\n", stu_info.Stu_registration_number);
 
     if (strlen(stu_info.stu_middlename) == 0)
@@ -4606,7 +4606,7 @@ int check_student_under_teacher(int stu_reg_no, int teach_reg_no)
         return 0;
     }
 
-    // Checck Subject
+    // Check Subject
     for (int i = 0; i < teach_aca_info.teacher_subject_count; i++)
     {
         for (int j = 0; j < stu_aca_info.stu_subject_count; j++)
@@ -4789,8 +4789,54 @@ void get_valid_student_by_email(int teacher_reg_no)
 
 // Check Student By Mobile Number
 
-void get_valid_student_by_number(int teacher_reg_no){
-    
+void get_valid_student_by_number(int teacher_reg_no)
+{
+    FILE *fp;
+    char stu_mobile_number[15];
+    struct student_info stu_info;
+    int found;
+
+    fp = fopen("Student_information.dat", "rb");
+    if (fp == NULL)
+    {
+        printf("File Not Found\n");
+        return;
+    }
+
+    while (1)
+    {
+        found = 0;
+
+        // Check Mobile Number
+        readmobilenumber("Enter Student Mobile Number : ", stu_mobile_number, sizeof(stu_mobile_number));
+
+        rewind(fp);
+
+        while (fread(&stu_info, sizeof(stu_info), 1, fp) == 1)
+        {
+            if (strcmp(stu_info.stu_mobile_number, stu_mobile_number) == 0)
+            {
+                found = 1;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            printf("Student Mobile Number Not Found\n");
+            continue;
+        }
+
+        if (!check_student_under_teacher(stu_info.Stu_registration_number, teacher_reg_no))
+        {
+            printf("Student is NOT under this teacher.\n");
+            continue;
+        }
+
+        print_student_details(stu_info.Stu_registration_number);
+        fclose(fp);
+        return;
+    }
 }
 
 // View A Particuar Student Under
@@ -4888,6 +4934,406 @@ void view_student_under()
     }
 }
 
+// ========================== View All Courses Under Function Items ==========================
+
+void view_courses_under()
+{
+    FILE *fp;
+    int ch, teach_reg_no, found;
+    struct teacher_academic_information teach_aca_info;
+
+    // Open File
+    fp = fopen("Teacher_Academic.dat", "rb");
+    if (fp == NULL)
+    {
+        printf("File Not Open\n");
+        return;
+    }
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (1)
+    {
+        found = 0;
+
+        printf("Enter Teacher Registration Number : ");
+        if (scanf("%d", &teach_reg_no) != 1)
+        {
+            printf("Invalid input! Enter numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        rewind(fp);
+
+        while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
+        {
+            if (teach_aca_info.teacher_registration_number == teach_reg_no)
+            {
+                found = 1;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            printf("Teacher Not Found\n");
+            continue;
+        }
+
+        printf("\nSubjects taught by Teacher %d:\n", teach_reg_no);
+        for (int i = 0; i < teach_aca_info.teacher_subject_count; i++)
+        {
+            printf("%s%s", teach_aca_info.teacher_subjects[i], (i == teach_aca_info.teacher_subject_count - 1) ? "\n" : ", ");
+        }
+
+        fclose(fp);
+        return;
+    }
+}
+
+// ========================== View All Students Under Function Items ==========================
+
+// Get Students Under Teacher
+
+void get_student_by_teacher_registartion(int teach_reg_no)
+{
+    FILE *fp;
+    int ch, found = 0;
+    struct student_info stu_info;
+    struct teacher_info teach_info;
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    fp = fopen("Student_information.dat", "rb");
+    if (fp == NULL)
+    {
+        printf("File Not Found\n");
+        return;
+    }
+
+    while (fread(&stu_info, sizeof(stu_info), 1, fp) == 1)
+    {
+        found = 0;
+        if (check_student_under_teacher(stu_info.Stu_registration_number, teach_reg_no))
+        {
+            print_student_details(stu_info.Stu_registration_number);
+        }
+    }
+    return;
+}
+
+// View Total Student Under Teacher
+void view_total_student_under()
+{
+    int teach_reg_no, ch;
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (1)
+    {
+        printf("Enter Registration Number : ");
+        if (scanf("%d", &teach_reg_no) != 1)
+        {
+            printf("Invalid input! Enter numbers only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        if (!check_teacher_registration_number(teach_reg_no))
+        {
+            printf("Invalid Registartion Number. Enter Again!\n");
+            continue;
+        }
+
+        get_student_by_teacher_registartion(teach_reg_no);
+    }
+    return;
+}
+
+// ========================== View All Class Under Function Items ==========================
+
+void view_class_under()
+{
+    FILE *fp;
+    int teach_reg_no, ch;
+    struct teacher_academic_information teach_aca_info;
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    while (1)
+    {
+        printf("Enter Registration Number : ");
+        if (scanf("%d", &teach_reg_no) != 1)
+        {
+            printf("Invalid Option! Enter Numbers Only.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        // Clear Buffer
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
+        if (!check_teacher_registration_number(teach_reg_no))
+        {
+            printf("Registration Number Not Found!\n");
+            continue;
+        }
+
+        // Open File
+        fp = fopen("Teacher_Academic.dat", "rb");
+        if (fp == NULL)
+        {
+            printf("Teacher Academic File Not Found!\n");
+            return;
+        }
+
+        while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
+        {
+            if (teach_aca_info.teacher_registration_number == teach_reg_no)
+            {
+                printf("Class : ");
+                for (int i = 0; i < teach_aca_info.teacher_preferred_class_count; i++)
+                {
+                    printf("%d%s", teach_aca_info.teacher_preferred_classes[i], (i == teach_aca_info.teacher_preferred_class_count - 1) ? "\n" : ", ");
+                }
+                fclose(fp);
+                return;
+            }
+        }
+
+        fclose(fp);
+        printf("Teacher academic record not found.\n");
+        return;
+    }
+}
+
+// ========================== Add New Class Function Items ==========================
+
+void assign_new_class()
+{
+    FILE *fp;
+    int ch, teach_reg_no;
+    struct teacher_academic_information teach_aca_info;
+
+    // Clear Buffer
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
+
+    fp = fopen("Teacher_Academic.dat", "rb+");
+    if (fp == NULL)
+    {
+        printf("File Not Found!\n");
+        return;
+    }
+
+    while (1)
+    {
+        printf("Enter Registration Number : ");
+        if (scanf("%d", &teach_reg_no) != 1)
+        {
+            printf("Invalid Input! Enter Numbers Only\n");
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
+        rewind(fp);
+
+        int found = 0;
+        while (fread(&teach_aca_info, sizeof(teach_aca_info), 1, fp) == 1)
+        {
+            if (teach_aca_info.teacher_registration_number == teach_reg_no)
+            {
+                found = 1;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            printf("Invalid Registration Number!\n");
+            continue;
+        }
+
+        if (teach_aca_info.teacher_preferred_class_count == MAX_CLASSES)
+        {
+            printf("Maximum Classes Assigned\n");
+            fclose(fp);
+            return;
+        }
+
+        int remaining = MAX_CLASSES - teach_aca_info.teacher_preferred_class_count;
+
+        readclassestakes(
+            &teach_aca_info.teacher_preferred_classes[teach_aca_info.teacher_preferred_class_count],
+            remaining,
+            teach_aca_info.teaching_level);
+
+        // Update class count
+        teach_aca_info.teacher_preferred_class_count += remaining;
+
+        // Move pointer back & overwrite same record
+        fseek(fp, -sizeof(teach_aca_info), SEEK_CUR);
+        fwrite(&teach_aca_info, sizeof(teach_aca_info), 1, fp);
+
+        printf("Class assigned successfully!\n");
+        fclose(fp);
+        return;
+    }
+}
+
+// ========================== Search Teacher Function Items ==========================
+
+// Search Teacher Dashboard
+
+void search_teacher_dashboard(){
+    printf("1. Search By Name\n");
+    printf("2. Search By Registration Number\n");
+    printf("3. Serach By School Email Id\n");
+    printf("4. Exit\n");
+}
+
+// Print Teacher All Information
+
+void print_teacher_all_information(int reg_number){
+    FILE *fp1,*fp2;
+    struct teacher_info teach_info;
+    struct teacher_academic_information teach_aca_info;
+    int found1 = 0,found2 = 0;
+
+    // File Open
+    fp1 = fopen("Teacher_information.dat","rb");
+    fp2 = fopen("Teacher_Academic.dat","rb");
+    if (fp1 == NULL || fp2 == NULL)
+    {
+        printf("File Not Found\n");
+        return;
+    }
+    
+    while (fread(&teach_info,sizeof(teach_info),1,fp1))
+    {
+        if (reg_number== teach_info.teach_registration_number)
+        {
+            found1 = 1;
+            printf("---------------------------- Teacher FOUND ----------------------------\n");
+            if (strlen(teach_info.teach_middlename>0))
+            {
+                printf("Teacher Name : %s %s %s\n",teach_info.teach_firstname,teach_info.teach_middlename,teach_info.teach_lastname);
+            }
+            else{
+                printf("Teacher Name : %s %s %s\n",teach_info.teach_firstname,teach_info.teach_lastname);
+            }
+            printf("Registration Number : %d\n",teach_info.teach_registration_number);
+            printf("Personal Email Id : %s\n",teach_info.teach_email);
+            printf("School Email Id : %s\n",teach_info.teach_School_email);
+            printf("Mobile Number : %s\n",teach_info.teach_mobile_number);
+            printf("DOB : %s\n",teach_info.teach_DOB);
+            printf("Gender : %s\n",teach_info.teach_gender);
+            printf("")
+        }
+        
+    }
+    
+}
+
+// Search Teacher By Name
+void search_teacher_Name(){
+    FILE *fp;
+    int ch,found = 0;
+    struct teacher_info teach_info;
+
+    char teach_first_name[100],teach_middle_name[100],teach_last_name[100];
+
+    // Clear Buffer
+    while((ch = getchar())!='\n' && ch!=EOF);
+
+    fp = fopen("Teacher_information.dat","rb");
+    if (fp == NULL)
+    {
+        printf("File Not Found\n");
+        return;
+    }
+    
+    readrequiredstring("Enter First Name : ", teach_first_name,sizeof(teach_first_name));
+    readoptionalstring("Enter Middle Name : ",teach_middle_name,sizeof(teach_middle_name));
+    readrequiredstring("Enter Last Name : ",teach_last_name,sizeof(teach_last_name));
+
+    while (fread(&teach_info,sizeof(teach_info),1,fp)==1)
+    {
+        if (strcmp(teach_first_name,teach_info.teach_firstname)==0 && strcmp(teach_middle_name,teach_info.teach_middlename)==0 && strcmp(teach_last_name,teach_info.teach_lastname)==0)
+        {
+            found = 1;
+            print_teacher_all_information(teach_info.teach_registration_number);
+        }
+    }
+    fclose(fp);
+    if (!found)
+    {
+        printf("Teacher Not Found!\n");
+    }
+    return
+}
+
+// Search Teacher Main Function
+void search_teacher()
+{
+    int option, ch;
+
+    while (1)
+    {
+        search_teacher_dashboard();
+        printf("Enter Option : ");
+        if (scanf("%d", &option) != 1)
+        {
+            printf("Invalid Option! Choose Between 1-4\n");
+
+            // Clear Buffer
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+            continue;
+        }
+
+        // Clear Buffer
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+
+        switch (option)
+        {
+        case 1:
+            search_teacher_Name();
+            break;
+        case 2:
+            search_teacher_registration();
+            break;
+        case 3:
+            search_teacher_email();
+            break;
+        case 4:
+            printf("Exiting...\n");
+            return;
+        default:
+            printf("Invalid Option! Choose Between 1-4\n");
+            break;
+        }
+    }
+}
+
 // Teacher Features List
 
 void teacher_features(int feature_option)
@@ -4916,7 +5362,7 @@ void teacher_features(int feature_option)
         view_total_student_under(); // View All Students Under
         break;
     case 8:
-        view_class_section_under(); // View All Class Under
+        view_class_under(); // View All Class Under
         break;
     case 9:
         assign_new_class(); // Assign New Class To a Teacher
