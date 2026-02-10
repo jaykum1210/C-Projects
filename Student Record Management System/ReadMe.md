@@ -1,61 +1,209 @@
-# 🎓 Student Record Management System (C)
+# 🏫 School Management System (C Language)
 
-This is a menu-driven student record system built in C. It runs straight from the terminal, handles all your data in files, and skips databases entirely. The whole idea is to show off some core C skills—think file handling, solid logic, and tidy structure.
+A **complete, menu-driven School Management System** developed in **C language**, designed to manage **students, teachers, parents, academics, classes, subjects, and results** using **file handling**.
 
+This project runs entirely in the **terminal/command line**, stores data persistently in files, and does **not use any database**, making it lightweight, fast, and perfect for demonstrating **core C programming skills**.
 
-## 🚀 Project Overview
+---
 
-Right out of the box, you can manage student records and keep them safe in a file—no data disappears when you close the program. It covers all the basics: add, view, update, and delete records. You can search, sort, get stats, and the program takes care of mistakes so you don’t have to worry about breaking anything. It’s a full-featured C project—perfect for your resume or talking points in an interview.
+## 📌 Project Overview
 
+The **School Management System** simulates how a real school operates digitally.  
+It is built with **three role-based dashboards**, ensuring proper access control and clean separation of responsibilities.
 
+### 🎯 Key Goals of the Project
+- Manage school records efficiently
+- Maintain persistent data using files
+- Implement real-world logic using C
+- Demonstrate structured and modular programming
+- Handle errors and invalid input safely
 
-## 🛠️ Tech Stack
+---
 
-- **Language:** C
-- **Key Concepts:**
-  - Structures
-  - File handling
-  - Modular functions
-  - Conditionals and loops
-  - String handling
-  - Sorting and searching
-  - Input checks and error management
+## 🧠 Dashboards Included
 
+1. 🎓 **Student Dashboard**
+2. 👩‍🏫 **Teacher Dashboard**
+3. 👨‍👩‍👧 **Parent Dashboard**
 
-## ✨ Features
+Each dashboard provides **specific features** based on the role.
 
-### 🔹 Core Features
+---
 
-- Add new student records
-- View all records at once
-- Search for students by ID or name
-- Update details for existing students
-- Delete records if you need to
-- Exit the program safely
+## 🛠️ Technology Stack
 
+### 🔧 Language & Tools
+- **Programming Language:** C
+- **Compiler:** GCC
+- **Platform:** Terminal / Command Line
 
-### 🔹 Advanced Search & Operations
+### 🧠 Concepts Used
+- Structures (`struct`)
+- File Handling (`fopen`, `fread`, `fwrite`, `fseek`, `rewind`)
+- Modular Programming
+- Menu-Driven Architecture
+- Input Validation
+- Searching & Filtering
+- String Manipulation
+- Temporary File Technique (Safe Update/Delete)
 
-- Find students by course, class, or section
-- Get the total student count
-- Sort records by ID, name, or marks
+---
 
+## 📂 File Handling & Storage
 
-### 🔹 Statistics
+All data is stored in **binary `.dat` files**.
 
-- See the average marks
-- Find out who scored highest and lowest
+| File Name | Description |
+|---------|------------|
+| `Student_information.dat` | Student personal details |
+| `Student_academic.dat` | Student academic & result data |
+| `Teacher_information.dat` | Teacher personal details |
+| `Teacher_Academic.dat` | Teacher professional & academic data |
+| `temp.dat` | Temporary file for safe update/delete |
 
+📌 If a file does not exist, the program **creates it automatically**.
 
-### 🔹 Data Integrity & Error Handling
+---
 
-- Checks to block duplicate IDs or empty/invalid fields
-- Handles file errors, missing records, or bad input without crashing
+## 🎓 Student Dashboard – Features (In Order)
 
+1. **Add Student Personal Information**
+   - Name, DOB, gender, caste
+   - Address & contact details
+   - Auto-generated registration number
+   - Auto-generated school email ID
 
-## 📂 File Handling Details
+2. **Add Student Academic Information**
+   - Class & section assignment
+   - Stream selection (Class 11–12)
+   - Subject allocation
 
-- All records go into `students.txt`
-- If the file’s missing, the program just creates it
-- Data sticks around between sessions—no need to re-enter every time
-- File handling stands in for a database, but keeps things light and simple
+3. **View Student Academic Details**
+   - Class, section, stream, subjects
+
+4. **Update Student Information**
+   - Name, address, contact details
+   - Safe update using temp files
+
+5. **View All Students**
+   - Display all student records
+
+6. **View Courses Under Student**
+   - Subjects based on class & stream
+
+7. **Search Student**
+   - By name
+   - By registration number
+   - By school email
+   - By personal email
+   - By mobile number
+
+8. **View Student Result**
+   - Subject-wise marks
+   - Total, percentage
+   - Pass/Fail status
+
+9. **Count Total Students**
+   - By class
+   - By section
+   - Entire school count
+
+10. **Delete Student Record**
+    - Deletes both personal & academic data safely
+
+---
+
+## 👩‍🏫 Teacher Dashboard – Features (In Order)
+
+1. **Add Teacher Personal Information**
+   - Name, DOB, gender, caste
+   - Contact & address
+   - Auto-generated registration number
+   - Auto-generated school email ID
+
+2. **Add Teacher Professional Information**
+   - Designation (PRT / TGT / PGT)
+   - Employment type (Permanent / Contract / Visiting)
+   - Qualification & specialization
+   - Teaching level
+   - Subjects taught
+   - Preferred classes
+
+3. **Update Teacher Information**
+   - Personal details
+   - Professional details
+   - Subjects & class preferences
+
+4. **View All Teachers**
+   - Displays teacher list with registration numbers
+
+5. **View Student Under Teacher**
+   - Shows only students assigned to that teacher
+
+6. **View Courses Under Teacher**
+   - Subjects taught by teacher
+
+7. **View Total Students Under Teacher**
+   - Count of students assigned
+
+8. **View Classes Under Teacher**
+   - Classes handled by teacher
+
+9. **Assign New Class**
+   - Dynamically add new classes
+
+10. **Search Teacher**
+    - By name
+    - By registration number
+    - By school email
+
+11. **View Student Result Under Teacher**
+    - Access limited to assigned students only
+
+12. **Add Student Result**
+    - Subject-wise marks entry
+    - Automatic total & percentage calculation
+
+---
+
+## 👨‍👩‍👧 Parent Dashboard – Features
+
+1. **View Student Details**
+   - Personal & academic information
+
+2. **View Student Result**
+   - Marks, percentage, pass/fail status
+
+3. **Update Student Details**
+   - Address & contact information
+
+4. **Remove Student**
+   - Delete student record with confirmation
+
+---
+
+## 🔐 Security & Validation Features
+
+- Prevents invalid class, section, marks
+- Blocks duplicate registration numbers
+- Teacher can access **only assigned students**
+- Safe update & delete using `temp.dat`
+- Handles missing files gracefully
+- Prevents program crash on wrong input
+
+---
+
+## 📊 Result System
+
+- Subject-wise marks entry
+- Automatic total calculation
+- Percentage calculation
+- Pass/Fail status generation
+
+---
+
+## ▶️ How to Compile & Run
+
+```bash
+gcc student.c -o student
+./student
